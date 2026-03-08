@@ -1023,6 +1023,17 @@ const MASTER = {
   plan:  'pro'
 };
 
+// Contas com plano PRO garantido (além do MASTER)
+const PRO_ACCOUNTS = [
+  'marc0s.ayale@gmail.com',
+  'maxv59895@gmail.com',
+  'samucasesso1339@gmail.com'
+];
+
+function isPro(email) {
+  return PRO_ACCOUNTS.includes((email||'').toLowerCase());
+}
+
 // ═══════════════════════════════════════════════════════════════
 //  ESTADO GLOBAL
 // ═══════════════════════════════════════════════════════════════
@@ -1039,19 +1050,39 @@ window.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     document.getElementById('pgSp').classList.remove('on');
 
-    const session = DB.get('session');
-    const saved   = session ? DB.get('u:'+session) : null;
+    _initFirebase(async () => {
+      // Verificar usuário logado no Firebase
+      const currentFbUser = await new Promise(resolve => {
+        const unsub = _auth.onAuthStateChanged(user => { unsub(); resolve(user); });
+      });
 
-    if (saved && saved.nome && saved.onboarded) {
-      U = saved;
-      U.plan = (U.email === MASTER.email) ? 'pro' : 'free';
-      iniciarApp();
-    } else if (saved && saved.nome) {
-      U = saved;
-      mostrar('pgPlan');
-    } else {
-      mostrar('pgAuth');
-    }
+      if (currentFbUser) {
+        await DB.syncFromCloud(currentFbUser.uid);
+        const email = currentFbUser.email;
+        DB.set('session', email);
+        const saved = DB.get('u:'+email);
+        if (saved && saved.nome && saved.onboarded) {
+          U = saved;
+          U.plan = isPro(U.email) ? 'pro' : 'free';
+          iniciarApp(); return;
+        } else if (saved && saved.nome) {
+          U = saved; mostrar('pgPlan'); return;
+        }
+      }
+
+      // Fallback local (MASTER ou offline)
+      const session = DB.get('session');
+      const saved   = session ? DB.get('u:'+session) : null;
+      if (saved && saved.nome && saved.onboarded) {
+        U = saved;
+        U.plan = isPro(U.email) ? 'pro' : 'free';
+        iniciarApp();
+      } else if (saved && saved.nome) {
+        U = saved; mostrar('pgPlan');
+      } else {
+        mostrar('pgAuth');
+      }
+    });
   }, 2400);
 });
 
@@ -2132,7 +2163,7 @@ window.addEventListener('load',()=>{ initPWA(); checkiOS(); });document.addEvent
       const saved = DB.get('u:'+email);
       if (saved && saved.nome && saved.onboarded) {
         U = saved;
-        U.plan = (U.email === MASTER.email) ? 'pro' : 'free';
+        U.plan = isPro(U.email) ? 'pro' : 'free';
         iniciarApp();
         return;
       } else if (saved && saved.nome) {
@@ -2147,7 +2178,7 @@ window.addEventListener('load',()=>{ initPWA(); checkiOS(); });document.addEvent
     const saved   = session ? DB.get('u:'+session) : null;
     if (saved && saved.nome && saved.onboarded) {
       U = saved;
-      U.plan = (U.email === MASTER.email) ? 'pro' : 'free';
+      U.plan = isPro(U.email) ? 'pro' : 'free';
       iniciarApp();
     } else if (saved && saved.nome) {
       U = saved;
