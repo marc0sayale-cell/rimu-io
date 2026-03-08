@@ -334,10 +334,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <link rel="manifest" id="pwaManifest">
   <!-- Apple touch icons -->
   <link rel="apple-touch-icon" id="appleIcon">
-  <!-- Firebase SDK v8 (mais estável e compatível) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
 
@@ -720,7 +716,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
         <div class="card cm"><div class="clbl">Plano atual</div><div style="font-size:14px;font-weight:600;margin-top:2px" id="profPlan">—</div>
           <button class="btnG" id="upgBtn" style="margin-top:12px;font-size:13px;padding:10px;display:none" onclick="openMov('mPay')">⬆️ Fazer upgrade para PRO</button>
         </div>
-        <button class="bto" onclick="toast('Em breve!')">Editar perfil</button>
+        <button class="bto" onclick="openEditPerfil()">✏️ Editar perfil</button>
         <button class="bto btoR" style="margin-top:8px" onclick="doLogout()">Sair da conta</button>
       </div>
     </div>
@@ -731,6 +727,70 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <div class="nv" id="nv-financas" onclick="goTab('financas')"><div class="ni">💰</div><div class="nl">Finanças</div></div>
       <div class="nv" id="nv-metas" onclick="navPro('metas')"><div class="ni">🎯</div><div class="nl">Metas</div></div>
       <div class="nv" id="nv-ai" onclick="navPro('ai')"><div class="ni">🤖</div><div class="nl">IA</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="mov" id="mEditPerfil" onclick="if(event.target===this)closeMov('mEditPerfil')">
+  <div class="mdl">
+    <div class="mdlH"></div>
+    <div class="mdlT">✏️ Editar Perfil</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="fg">
+        <div class="fl">Nome</div>
+        <input class="fi" id="editNome" placeholder="Seu nome">
+      </div>
+      <div class="fg">
+        <div class="fl">Peso atual (kg)</div>
+        <div class="sliVal"><span id="editPesoVal">70</span><span class="sliUnit">kg</span></div>
+        <input type="range" id="editPeso" min="40" max="200" step="0.5" oninput="document.getElementById('editPesoVal').textContent=this.value">
+        <div class="sliLbl"><span>40kg</span><span>200kg</span></div>
+      </div>
+      <div class="fg">
+        <div class="fl">Meta de peso (kg)</div>
+        <div class="sliVal"><span id="editMetaVal">65</span><span class="sliUnit">kg</span></div>
+        <input type="range" id="editMeta" min="40" max="200" step="0.5" oninput="document.getElementById('editMetaVal').textContent=this.value">
+        <div class="sliLbl"><span>40kg</span><span>200kg</span></div>
+      </div>
+      <div class="fg">
+        <div class="fl">Objetivo</div>
+        <select class="fi" id="editObjetivo">
+          <option value="Perder gordura">🔥 Perder gordura</option>
+          <option value="Ganhar massa">💪 Ganhar massa</option>
+          <option value="Manter peso">⚖️ Manter peso</option>
+          <option value="Melhorar condicionamento">🏃 Melhorar condicionamento</option>
+          <option value="Saúde geral">❤️ Saúde geral</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Nível de treino</div>
+        <select class="fi" id="editNivel">
+          <option value="Iniciante">🌱 Iniciante</option>
+          <option value="Intermediário">⚡ Intermediário</option>
+          <option value="Avançado">🔥 Avançado</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Local de treino</div>
+        <select class="fi" id="editLocal">
+          <option value="Academia">🏋️ Academia</option>
+          <option value="Casa">🏠 Casa</option>
+          <option value="Ar livre">🌳 Ar livre</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Frequência semanal</div>
+        <select class="fi" id="editFreq">
+          <option value="2x">2x por semana</option>
+          <option value="3x">3x por semana</option>
+          <option value="4x">4x por semana</option>
+          <option value="5x">5x por semana</option>
+          <option value="6x">6x por semana</option>
+        </select>
+      </div>
+      <button class="btnG" onclick="salvarEdicaoPerfil()">💾 Salvar alterações</button>
+      <button class="bto" style="margin-top:-4px" onclick="refazerQuestionario()">🔄 Refazer questionário completo</button>
     </div>
   </div>
 </div>
@@ -890,6 +950,70 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 </div>
 
+<!-- EDIT PROFILE MODAL -->
+<div class="mov" id="mEditPerfil" onclick="if(event.target===this)closeMov('mEditPerfil')">
+  <div class="mdl">
+    <div class="mdlH"></div>
+    <div class="mdlT">✏️ Editar Perfil</div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="fg">
+        <div class="fl">Nome</div>
+        <input class="fi" id="editNome" placeholder="Seu nome">
+      </div>
+      <div class="fg">
+        <div class="fl">Peso atual (kg)</div>
+        <div class="sliVal"><span id="editPesoVal">70</span><span class="sliUnit">kg</span></div>
+        <input type="range" id="editPeso" min="40" max="200" step="0.5" oninput="document.getElementById('editPesoVal').textContent=this.value">
+        <div class="sliLbl"><span>40kg</span><span>200kg</span></div>
+      </div>
+      <div class="fg">
+        <div class="fl">Meta de peso (kg)</div>
+        <div class="sliVal"><span id="editMetaVal">65</span><span class="sliUnit">kg</span></div>
+        <input type="range" id="editMeta" min="40" max="200" step="0.5" oninput="document.getElementById('editMetaVal').textContent=this.value">
+        <div class="sliLbl"><span>40kg</span><span>200kg</span></div>
+      </div>
+      <div class="fg">
+        <div class="fl">Objetivo</div>
+        <select class="fi" id="editObjetivo">
+          <option value="Perder gordura">🔥 Perder gordura</option>
+          <option value="Ganhar massa">💪 Ganhar massa</option>
+          <option value="Manter peso">⚖️ Manter peso</option>
+          <option value="Melhorar condicionamento">🏃 Melhorar condicionamento</option>
+          <option value="Saúde geral">❤️ Saúde geral</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Nível de treino</div>
+        <select class="fi" id="editNivel">
+          <option value="Iniciante">🌱 Iniciante</option>
+          <option value="Intermediário">⚡ Intermediário</option>
+          <option value="Avançado">🔥 Avançado</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Local de treino</div>
+        <select class="fi" id="editLocal">
+          <option value="Academia">🏋️ Academia</option>
+          <option value="Casa">🏠 Casa</option>
+          <option value="Ar livre">🌳 Ar livre</option>
+        </select>
+      </div>
+      <div class="fg">
+        <div class="fl">Frequência semanal</div>
+        <select class="fi" id="editFreq">
+          <option value="2x">2x por semana</option>
+          <option value="3x">3x por semana</option>
+          <option value="4x">4x por semana</option>
+          <option value="5x">5x por semana</option>
+          <option value="6x">6x por semana</option>
+        </select>
+      </div>
+      <button class="btnG" onclick="salvarEdicaoPerfil()">💾 Salvar alterações</button>
+      <button class="bto" style="margin-top:-4px" onclick="refazerQuestionario()">🔄 Refazer questionário completo</button>
+    </div>
+  </div>
+</div>
+
 <!-- RECIPE MODAL -->
 <div class="mov" id="mRec" onclick="if(event.target===this)closeMov('mRec')">
   <div class="mdl" style="max-height:90vh">
@@ -940,11 +1064,11 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 
 <div class="toast" id="toastEl"></div>
 
-
 <script>
 // ═══════════════════════════════════════════════════════════════
 //  DATABASE
 // ═══════════════════════════════════════════════════════════════
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyDOeUxpwmFTj3rlmIVaMRSXSAd9deTOB38",
   authDomain: "rimu-io.firebaseapp.com",
@@ -953,65 +1077,63 @@ const firebaseConfig = {
   messagingSenderId: "349836376444",
   appId: "1:349836376444:web:d34fafb88cf34cdd850cf9"
 };
-
-// ── Firebase inicializado via CDN (carregado no HTML)
-let _fbApp, _auth, _db;
-function _initFirebase() {
-  if (_fbApp) return;
-  _fbApp = firebase.initializeApp(firebaseConfig);
-  _auth  = firebase.auth();
-  _db    = firebase.firestore();
+let _fbApp=null, _auth=null, _db=null, _fbLoaded=false;
+function _loadFirebase(cb) {
+  if (_fbLoaded) { if(cb) cb(); return; }
+  const urls = [
+    'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js',
+    'https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js',
+    'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js'
+  ];
+  let i = 0;
+  function next() {
+    if (i >= urls.length) {
+      try {
+        if (!_fbApp) {
+          _fbApp = firebase.initializeApp(firebaseConfig);
+          _auth  = firebase.auth();
+          _db    = firebase.firestore();
+        }
+        _fbLoaded = true;
+      } catch(e) { console.warn('Firebase init falhou:', e); }
+      if (cb) cb(); return;
+    }
+    const s = document.createElement('script');
+    s.src = urls[i++];
+    s.onload = next;
+    s.onerror = () => { if(cb) cb(); };
+    document.head.appendChild(s);
+  }
+  next();
 }
-
-// ── DB híbrido: localStorage como cache imediato + Firestore na nuvem
 const DB = {
-  get(k) {
-    try { const r = localStorage.getItem('rimu_'+k); return r===null?null:JSON.parse(r); }
-    catch(e){return null;}
-  },
-  set(k, v) {
+  get(k)       { try { const r=localStorage.getItem('rimu_'+k); return r===null?null:JSON.parse(r); } catch(e){return null;} },
+  set(k,v)     {
     try {
       localStorage.setItem('rimu_'+k, JSON.stringify(v));
-      // Salvar na nuvem se usuário logado
       if (_db && _auth && _auth.currentUser) {
-        const uid = _auth.currentUser.uid;
-        _db.collection('users').doc(uid).set({ [k.replace(/:/g,'__')]: JSON.stringify(v) }, { merge: true })
-          .catch(e => console.warn('Firestore set error:', e));
+        _db.collection('users').doc(_auth.currentUser.uid)
+          .set({[k.replace(/:/g,'__')]: JSON.stringify(v)},{merge:true}).catch(()=>{});
       }
       return true;
     } catch(e){return false;}
   },
-  del(k) {
-    try {
-      localStorage.removeItem('rimu_'+k);
-      if (_db && _auth && _auth.currentUser) {
-        const uid = _auth.currentUser.uid;
-        _db.collection('users').doc(uid).update({ [k.replace(/:/g,'__')]: firebase.firestore.FieldValue.delete() })
-          .catch(()=>{});
-      }
-    } catch(e){}
-  },
-  push(k, item) { const a=this.get(k)||[]; a.push(item); this.set(k,a); },
-
-  // Carregar todos os dados do Firestore para o localStorage (sync ao login)
+  del(k)       { try { localStorage.removeItem('rimu_'+k); } catch(e){} },
+  push(k,item) { const a=this.get(k)||[]; a.push(item); this.set(k,a); },
   async syncFromCloud(uid) {
+    if (!_db) return false;
     try {
       const doc = await _db.collection('users').doc(uid).get();
       if (doc.exists) {
-        const data = doc.data();
-        Object.entries(data).forEach(([k, v]) => {
-          // Converter chaves de volta (__ → :)
-          const localKey = k.replace(/__/g, ':');
-          localStorage.setItem('rimu_' + localKey, v);
+        Object.entries(doc.data()).forEach(([k,v]) => {
+          localStorage.setItem('rimu_'+k.replace(/__/g,':'), v);
         });
         return true;
       }
-    } catch(e) { console.warn('Sync error:', e); }
+    } catch(e) {}
     return false;
   }
 };
-
-
 
 // ═══════════════════════════════════════════════════════════════
 //  CONTA MASTER — Marcos tem PRO grátis sempre
@@ -1022,14 +1144,11 @@ const MASTER = {
   nome:  'Marcos',
   plan:  'pro'
 };
-
-// Contas com plano PRO garantido (além do MASTER)
 const PRO_ACCOUNTS = [
   'marc0s.ayale@gmail.com',
   'maxv59895@gmail.com',
   'samucasesso1339@gmail.com'
 ];
-
 function isPro(email) {
   return PRO_ACCOUNTS.includes((email||'').toLowerCase());
 }
@@ -1044,46 +1163,26 @@ let obStep = 1;
 // ═══════════════════════════════════════════════════════════════
 //  BOOT
 // ═══════════════════════════════════════════════════════════════
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   preencherDatas();
-
   setTimeout(() => {
     document.getElementById('pgSp').classList.remove('on');
-
-    _initFirebase(async () => {
-      // Verificar usuário logado no Firebase
-      const currentFbUser = await new Promise(resolve => {
-        const unsub = _auth.onAuthStateChanged(user => { unsub(); resolve(user); });
+    const session = DB.get('session');
+    const saved   = session ? DB.get('u:'+session) : null;
+    if (saved && saved.nome && saved.onboarded) {
+      U = saved; U.plan = isPro(U.email) ? 'pro' : 'free'; iniciarApp();
+      // Sincronizar Firebase em segundo plano
+      _loadFirebase(() => {
+        if (_fbLoaded && _auth) _auth.onAuthStateChanged(async user => {
+          if (user && user.email === session) await DB.syncFromCloud(user.uid);
+        });
       });
-
-      if (currentFbUser) {
-        await DB.syncFromCloud(currentFbUser.uid);
-        const email = currentFbUser.email;
-        DB.set('session', email);
-        const saved = DB.get('u:'+email);
-        if (saved && saved.nome && saved.onboarded) {
-          U = saved;
-          U.plan = isPro(U.email) ? 'pro' : 'free';
-          iniciarApp(); return;
-        } else if (saved && saved.nome) {
-          U = saved; mostrar('pgPlan'); return;
-        }
-      }
-
-      // Fallback local (MASTER ou offline)
-      const session = DB.get('session');
-      const saved   = session ? DB.get('u:'+session) : null;
-      if (saved && saved.nome && saved.onboarded) {
-        U = saved;
-        U.plan = isPro(U.email) ? 'pro' : 'free';
-        iniciarApp();
-      } else if (saved && saved.nome) {
-        U = saved; mostrar('pgPlan');
-      } else {
-        mostrar('pgAuth');
-      }
-    });
-  }, 2400);
+    } else if (saved && saved.nome) {
+      U = saved; mostrar('pgPlan');
+    } else {
+      mostrar('pgAuth');
+    }
+  }, 2000);
 });
 
 function mostrar(id) {
@@ -1117,8 +1216,6 @@ function doLogin() {
   const senha = (document.getElementById('lPass').value||'');
   if (!email) { toast('Digite seu e-mail'); return; }
   if (!senha)  { toast('Digite sua senha'); return; }
-
-  // Conta MASTER — autenticação local, sem Firebase Auth
   if (email === MASTER.email) {
     if (senha !== MASTER.senha) { toast('Senha incorreta'); return; }
     const saved = DB.get('u:'+email) || {};
@@ -1128,34 +1225,48 @@ function doLogin() {
     if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
     return;
   }
-
-  // Usuários normais — Firebase Auth
-  _initFirebase();
   const btn = document.querySelector('#pgAuth .btnG');
   if (btn) { btn.textContent = 'ENTRANDO...'; btn.disabled = true; }
-
-  _auth.signInWithEmailAndPassword(email, senha)
-    .then(async (cred) => {
-      // Sincronizar dados da nuvem para o localStorage
-      await DB.syncFromCloud(cred.user.uid);
-      const saved = DB.get('u:'+email) || {};
-      U = Object.assign({ email, plan:'free' }, saved);
-      DB.set('session', email);
+  function done() { if (btn) { btn.textContent = 'ENTRAR'; btn.disabled = false; } }
+  _loadFirebase(() => {
+    if (!_fbLoaded || !_auth) {
+      const saved = DB.get('u:'+email);
+      if (!saved) { toast('Sem conexão e conta não encontrada'); done(); return; }
+      if (saved.senha && saved.senha !== senha) { toast('Senha incorreta'); done(); return; }
+      U = saved; U.plan = isPro(U.email) ? 'pro' : 'free';
+      DB.set('session', email); done();
       if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
-    })
-    .catch(err => {
-      let msg = 'Erro ao entrar';
-      if (err.code === 'auth/user-not-found')   msg = 'Conta não encontrada';
-      if (err.code === 'auth/wrong-password')    msg = 'Senha incorreta';
-      if (err.code === 'auth/invalid-email')     msg = 'E-mail inválido';
-      if (err.code === 'auth/too-many-requests') msg = 'Muitas tentativas, tente mais tarde';
-      toast(msg);
-    })
-    .finally(() => {
-      if (btn) { btn.textContent = 'ENTRAR'; btn.disabled = false; }
-    });
+      return;
+    }
+    _auth.signInWithEmailAndPassword(email, senha)
+      .then(async cred => {
+        await DB.syncFromCloud(cred.user.uid);
+        const saved = DB.get('u:'+email) || {};
+        U = Object.assign({ nome: cred.user.displayName||'Usuário', email, plan:'free' }, saved);
+        U.plan = isPro(U.email) ? 'pro' : 'free';
+        DB.set('u:'+email, U);
+        DB.set('session', email);
+        if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
+      })
+      .catch(err => {
+        console.error('LOGIN ERROR:', err.code, err.message);
+        if (err.code==='auth/user-not-found') {
+          toast('Conta não encontrada');
+        } else if (err.code==='auth/wrong-password' || err.code==='auth/invalid-password') {
+          toast('Senha incorreta');
+        } else if (err.code==='auth/invalid-credential' || err.code==='auth/invalid-email') {
+          toast('E-mail ou senha incorretos');
+        } else if (err.code==='auth/too-many-requests') {
+          toast('Muitas tentativas, tente mais tarde');
+        } else if (err.code==='auth/network-request-failed') {
+          toast('Sem conexão com a internet');
+        } else {
+          toast(err.code || err.message || 'Erro desconhecido');
+        }
+      })
+      .finally(done);
+  });
 }
-
 
 function doRegister() {
   const nome  = (document.getElementById('rName').value||'').trim();
@@ -1165,56 +1276,53 @@ function doRegister() {
   if (!email)           { toast('Digite seu e-mail'); return; }
   if (senha.length < 6) { toast('Senha mínimo 6 caracteres'); return; }
   if (email === MASTER.email) { toast('E-mail indisponível'); return; }
-
-  _initFirebase();
   const btn = document.querySelector('#pgAuth .btnG');
   if (btn) { btn.textContent = 'CRIANDO...'; btn.disabled = true; }
-
-  _auth.createUserWithEmailAndPassword(email, senha)
-    .then(cred => {
-      U = { nome, email, plan:'free' };
-      DB.set('u:'+email, U);
-      DB.set('session', email);
-      mostrar('pgPlan');
-    })
-    .catch(err => {
-      let msg = 'Erro ao criar conta';
-      if (err.code === 'auth/email-already-in-use') msg = 'E-mail já cadastrado! Faça login.';
-      if (err.code === 'auth/invalid-email')         msg = 'E-mail inválido';
-      if (err.code === 'auth/weak-password')         msg = 'Senha muito fraca';
-      toast(msg);
-    })
-    .finally(() => {
-      if (btn) { btn.textContent = 'CRIAR CONTA'; btn.disabled = false; }
-    });
+  function done() { if (btn) { btn.textContent = 'CRIAR CONTA'; btn.disabled = false; } }
+  _loadFirebase(() => {
+    if (!_fbLoaded || !_auth) {
+      if (DB.get('u:'+email)) { toast('E-mail já cadastrado! Faça login.'); done(); return; }
+      U = { nome, email, senha, plan:'free' };
+      DB.set('u:'+email, U); DB.set('session', email);
+      mostrar('pgPlan'); done(); return;
+    }
+    _auth.createUserWithEmailAndPassword(email, senha)
+      .then(cred => {
+        const plan = isPro(email) ? 'pro' : 'free';
+        U = { nome, email, plan };
+        DB.set('u:'+email, U); DB.set('session', email);
+        if (plan === 'pro') toast('🌟 Conta PRO ativada!');
+        mostrar('pgPlan');
+      })
+      .catch(err => {
+        const msgs = {'auth/email-already-in-use':'E-mail já cadastrado! Faça login.','auth/invalid-email':'E-mail inválido','auth/weak-password':'Senha muito fraca'};
+        toast(msgs[err.code] || 'Erro ao criar conta');
+      })
+      .finally(done);
+  });
 }
 
-
 function doSocial(prov) {
-  if (prov !== 'Google') { toast('Em breve: login com ' + prov); return; }
-  _initFirebase();
-  const provider = new firebase.auth.GoogleAuthProvider();
-  _auth.signInWithPopup(provider)
-    .then(async (result) => {
-      const user = result.user;
-      const email = user.email;
-      // Sincronizar dados da nuvem
-      await DB.syncFromCloud(user.uid);
-      const saved = DB.get('u:'+email) || {};
-      U = Object.assign({ nome: user.displayName || 'Usuário', email, plan:'free' }, saved);
-      DB.set('u:'+email, U);
-      DB.set('session', email);
-      if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
-    })
-    .catch(err => {
-      console.error('Google login error:', err);
-      if (err.code === 'auth/popup-closed-by-user') return;
-      if (err.code === 'auth/popup-blocked') {
-        toast('Popup bloqueado — permita popups para este site');
-      } else {
-        toast('Erro ao entrar com Google');
-      }
-    });
+  if (prov !== 'Google') { toast('Em breve: login com '+prov); return; }
+  _loadFirebase(() => {
+    if (!_fbLoaded || !_auth) { toast('Sem conexão com a internet'); return; }
+    const provider = new firebase.auth.GoogleAuthProvider();
+    _auth.signInWithPopup(provider)
+      .then(async result => {
+        const user = result.user;
+        await DB.syncFromCloud(user.uid);
+        const email = user.email;
+        const saved = DB.get('u:'+email) || {};
+        U = Object.assign({ nome: user.displayName||'Usuário', email, plan:'free' }, saved);
+        U.plan = isPro(U.email) ? 'pro' : 'free';
+        DB.set('u:'+email, U); DB.set('session', email);
+        if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
+      })
+      .catch(err => {
+        if (err.code==='auth/popup-closed-by-user') return;
+        toast(err.code==='auth/popup-blocked' ? 'Permita popups para este site' : 'Erro ao entrar com Google');
+      });
+  });
 }
 
 function doLogout() {
@@ -1227,15 +1335,14 @@ function doLogout() {
   toast('Até logo! 👋');
 }
 
-
 // ═══════════════════════════════════════════════════════════════
 //  PLANO
 // ═══════════════════════════════════════════════════════════════
 function choosePlan(plano) {
-  if (plano === 'pro' && U.email !== MASTER.email) {
+  if (plano === 'pro' && !isPro(U.email)) {
     openMov('mPay'); return;
   }
-  U.plan = (plano === 'pro') ? 'pro' : 'free';
+  U.plan = isPro(U.email) ? 'pro' : (plano === 'pro' ? 'pro' : 'free');
   DB.set('u:'+U.email, U); DB.set('session', U.email);
   if (U.onboarded) { iniciarApp(); return; }
   mostrar('pgOb');
@@ -2143,1080 +2250,66 @@ function checkiOS(){
   }
 }
 
-window.addEventListener('load',()=>{ initPWA(); checkiOS(); });document.addEventListener('DOMContentLoaded', () => {
-  preencherDatas();
-  _initFirebase();
-
-  setTimeout(async () => {
-    document.getElementById('pgSp').classList.remove('on');
-
-    // Verificar se Firebase tem usuário logado
-    const currentFbUser = await new Promise(resolve => {
-      const unsub = _auth.onAuthStateChanged(user => { unsub(); resolve(user); });
-    });
-
-    if (currentFbUser) {
-      // Usuário Firebase logado — sincronizar dados da nuvem
-      await DB.syncFromCloud(currentFbUser.uid);
-      const email = currentFbUser.email;
-      DB.set('session', email);
-      const saved = DB.get('u:'+email);
-      if (saved && saved.nome && saved.onboarded) {
-        U = saved;
-        U.plan = isPro(U.email) ? 'pro' : 'free';
-        iniciarApp();
-        return;
-      } else if (saved && saved.nome) {
-        U = saved;
-        mostrar('pgPlan');
-        return;
-      }
-    }
-
-    // Fallback: verificar sessão local (MASTER ou offline)
-    const session = DB.get('session');
-    const saved   = session ? DB.get('u:'+session) : null;
-    if (saved && saved.nome && saved.onboarded) {
-      U = saved;
-      U.plan = isPro(U.email) ? 'pro' : 'free';
-      iniciarApp();
-    } else if (saved && saved.nome) {
-      U = saved;
-      mostrar('pgPlan');
-    } else {
-      mostrar('pgAuth');
-    }
-  }, 2400);
-});
-
-
-function mostrar(id) {
-  ['pgSp','pgAuth','pgPlan','pgOb','pgGen','pgApp'].forEach(p => {
-    document.getElementById(p).classList.toggle('on', p===id);
-  });
-}
-
-function preencherDatas() {
-  const dSel = document.getElementById('ob_dia');
-  if (!dSel) return;
-  for (let i=1;i<=31;i++) { const o=document.createElement('option'); o.value=i; o.textContent=String(i).padStart(2,'0'); dSel.appendChild(o); }
-  dSel.value = 15;
-  const aSel = document.getElementById('ob_ano');
-  const ano = new Date().getFullYear();
-  for (let y=ano-10;y>=1940;y--) { const o=document.createElement('option'); o.value=y; o.textContent=y; aSel.appendChild(o); }
-  aSel.value = 1998;
-}
 
 // ═══════════════════════════════════════════════════════════════
-//  AUTH
+//  EDIÇÃO DE PERFIL
 // ═══════════════════════════════════════════════════════════════
-function authTab(t) {
-  document.querySelectorAll('.tabBtn').forEach((b,i) => b.classList.toggle('on', i===(t==='login'?0:1)));
-  document.getElementById('fLogin').classList.toggle('hide', t!=='login');
-  document.getElementById('fReg').classList.toggle('hide', t!=='reg');
+function openEditPerfil() {
+  // Preencher com dados atuais
+  document.getElementById('editNome').value       = U.nome       || '';
+  document.getElementById('editPeso').value       = U.peso       || 70;
+  document.getElementById('editPesoVal').textContent = U.peso    || 70;
+  document.getElementById('editMeta').value       = U.metaPeso   || 65;
+  document.getElementById('editMetaVal').textContent = U.metaPeso || 65;
+  document.getElementById('editObjetivo').value   = U.objetivo   || 'Perder gordura';
+  document.getElementById('editNivel').value      = U.nivel      || 'Intermediário';
+  document.getElementById('editLocal').value      = U.local      || 'Academia';
+  document.getElementById('editFreq').value       = U.freq       || '3x';
+  openMov('mEditPerfil');
 }
 
-function doLogin() {
-  const email = (document.getElementById('lEmail').value||'').trim().toLowerCase();
-  const senha = (document.getElementById('lPass').value||'');
-  if (!email) { toast('Digite seu e-mail'); return; }
-  if (!senha)  { toast('Digite sua senha'); return; }
+function salvarEdicaoPerfil() {
+  const nome = document.getElementById('editNome').value.trim();
+  if (!nome) { toast('Digite seu nome'); return; }
 
-  // Conta MASTER — autenticação local, sem Firebase Auth
-  if (email === MASTER.email) {
-    if (senha !== MASTER.senha) { toast('Senha incorreta'); return; }
-    const saved = DB.get('u:'+email) || {};
-    U = Object.assign({ email:MASTER.email, nome:MASTER.nome, plan:'pro', senha:MASTER.senha }, saved);
-    U.plan = 'pro';
-    DB.set('u:'+email, U); DB.set('session', email);
-    if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
-    return;
-  }
+  U.nome      = nome;
+  U.peso      = +document.getElementById('editPeso').value;
+  U.metaPeso  = +document.getElementById('editMeta').value;
+  U.objetivo  = document.getElementById('editObjetivo').value;
+  U.nivel     = document.getElementById('editNivel').value;
+  U.local     = document.getElementById('editLocal').value;
+  U.freq      = document.getElementById('editFreq').value;
 
-  // Usuários normais — Firebase Auth
-  _initFirebase();
-  const btn = document.querySelector('#pgAuth .btnG');
-  if (btn) { btn.textContent = 'ENTRANDO...'; btn.disabled = true; }
-
-  _auth.signInWithEmailAndPassword(email, senha)
-    .then(async (cred) => {
-      // Sincronizar dados da nuvem para o localStorage
-      await DB.syncFromCloud(cred.user.uid);
-      const saved = DB.get('u:'+email) || {};
-      U = Object.assign({ email, plan:'free' }, saved);
-      DB.set('session', email);
-      if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
-    })
-    .catch(err => {
-      let msg = 'Erro ao entrar';
-      if (err.code === 'auth/user-not-found')   msg = 'Conta não encontrada';
-      if (err.code === 'auth/wrong-password')    msg = 'Senha incorreta';
-      if (err.code === 'auth/invalid-email')     msg = 'E-mail inválido';
-      if (err.code === 'auth/too-many-requests') msg = 'Muitas tentativas, tente mais tarde';
-      toast(msg);
-    })
-    .finally(() => {
-      if (btn) { btn.textContent = 'ENTRAR'; btn.disabled = false; }
-    });
-}
-
-
-function doRegister() {
-  const nome  = (document.getElementById('rName').value||'').trim();
-  const email = (document.getElementById('rEmail').value||'').trim().toLowerCase();
-  const senha = (document.getElementById('rPass').value||'');
-  if (!nome)            { toast('Digite seu nome'); return; }
-  if (!email)           { toast('Digite seu e-mail'); return; }
-  if (senha.length < 6) { toast('Senha mínimo 6 caracteres'); return; }
-  if (email === MASTER.email) { toast('E-mail indisponível'); return; }
-
-  _initFirebase();
-  const btn = document.querySelector('#pgAuth .btnG');
-  if (btn) { btn.textContent = 'CRIANDO...'; btn.disabled = true; }
-
-  _auth.createUserWithEmailAndPassword(email, senha)
-    .then(cred => {
-      U = { nome, email, plan:'free' };
-      DB.set('u:'+email, U);
-      DB.set('session', email);
-      mostrar('pgPlan');
-    })
-    .catch(err => {
-      let msg = 'Erro ao criar conta';
-      if (err.code === 'auth/email-already-in-use') msg = 'E-mail já cadastrado! Faça login.';
-      if (err.code === 'auth/invalid-email')         msg = 'E-mail inválido';
-      if (err.code === 'auth/weak-password')         msg = 'Senha muito fraca';
-      toast(msg);
-    })
-    .finally(() => {
-      if (btn) { btn.textContent = 'CRIAR CONTA'; btn.disabled = false; }
-    });
-}
-
-
-function doSocial(prov) {
-  if (prov !== 'Google') { toast('Em breve: login com ' + prov); return; }
-  _initFirebase();
-  const provider = new firebase.auth.GoogleAuthProvider();
-  _auth.signInWithPopup(provider)
-    .then(async (result) => {
-      const user = result.user;
-      const email = user.email;
-      // Sincronizar dados da nuvem
-      await DB.syncFromCloud(user.uid);
-      const saved = DB.get('u:'+email) || {};
-      U = Object.assign({ nome: user.displayName || 'Usuário', email, plan:'free' }, saved);
-      DB.set('u:'+email, U);
-      DB.set('session', email);
-      if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
-    })
-    .catch(err => {
-      console.error('Google login error:', err);
-      if (err.code === 'auth/popup-closed-by-user') return;
-      if (err.code === 'auth/popup-blocked') {
-        toast('Popup bloqueado — permita popups para este site');
-      } else {
-        toast('Erro ao entrar com Google');
-      }
-    });
-}
-
-function doLogout() {
-  if (_auth && _auth.currentUser) _auth.signOut().catch(()=>{});
-  DB.del('session');
-  U = {}; chatHist = [];
-  document.getElementById('lEmail').value = '';
-  document.getElementById('lPass').value  = '';
-  mostrar('pgAuth');
-  toast('Até logo! 👋');
-}
-
-
-// ═══════════════════════════════════════════════════════════════
-//  PLANO
-// ═══════════════════════════════════════════════════════════════
-function choosePlan(plano) {
-  if (plano === 'pro' && U.email !== MASTER.email) {
-    openMov('mPay'); return;
-  }
-  U.plan = (plano === 'pro') ? 'pro' : 'free';
-  DB.set('u:'+U.email, U); DB.set('session', U.email);
-  if (U.onboarded) { iniciarApp(); return; }
-  mostrar('pgOb');
-  obStep = 1; renderStep();
-  document.getElementById('ob_nome').value = U.nome || '';
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  ONBOARDING
-// ═══════════════════════════════════════════════════════════════
-function renderStep() {
-  document.querySelectorAll('.obStep').forEach(s => s.classList.remove('on'));
-  document.getElementById('os'+obStep).classList.add('on');
-  const pct = Math.round((obStep/7)*100);
-  document.getElementById('obFill').style.width = pct+'%';
-  document.getElementById('obLbl').textContent  = `Passo ${obStep} de 7`;
-  document.getElementById('obPct').textContent  = pct+'%';
-  document.getElementById('obNx').textContent   = obStep===7 ? '🚀 Gerar meu plano!' : 'Continuar →';
-}
-
-function obNext() {
-  if (obStep === 1) {
-    const nome = (document.getElementById('ob_nome').value||'').trim();
-    const sexo = document.getElementById('ob_sexo').value;
-    const alt  = document.getElementById('ob_alt').value;
-    if (!nome)                       { toast('Digite seu nome 😊'); return; }
-    if (!sexo)                       { toast('Selecione seu sexo'); return; }
-    if (!alt||+alt<100||+alt>250)    { toast('Digite sua altura em cm (ex: 175)'); return; }
-  }
-  if (obStep === 3 && !document.querySelector('#gOpts .opt.sel'))      { toast('Selecione seu objetivo 🎯'); return; }
-  if (obStep === 4 && !document.querySelector('#lvlOpts .opt.sel'))    { toast('Selecione seu nível 💪'); return; }
-  if (obStep === 5) {
-    if (!document.querySelector('#localOpts .opt.sel'))  { toast('Selecione onde você treina 🏠'); return; }
-    if (!document.querySelector('#frOpts .opt.sel'))     { toast('Selecione quantos dias 🏋️'); return; }
-  }
-  if (obStep === 6 && !document.querySelector('#dietOpts .opt.sel'))   { toast('Selecione sua dieta 🥗'); return; }
-  if (obStep === 7 && !document.querySelector('#empOpts .opt.sel'))    { toast('Selecione sua situação 💼'); return; }
-
-  if (obStep < 7) { obStep++; renderStep(); }
-  else { coletarOnboarding(); rodarGeracao(); }
-}
-
-function obBack() {
-  if (obStep > 1) { obStep--; renderStep(); }
-  else mostrar('pgPlan');
-}
-
-function sel(el, gid) {
-  document.querySelectorAll('#'+gid+' .opt').forEach(o => {
-    o.classList.remove('sel');
-    const c = o.querySelector('.optCk'); if(c) c.textContent='';
-  });
-  el.classList.add('sel');
-  const c = el.querySelector('.optCk'); if(c) c.textContent='✓';
-}
-
-function showR(show, lbl) {
-  const w = document.getElementById('rendaW');
-  w.style.display = show ? 'flex' : 'none';
-  if (lbl) document.getElementById('rendaLbl').textContent = lbl;
-}
-
-function coletarOnboarding() {
-  U.nome    = (document.getElementById('ob_nome').value||'').trim() || U.nome || 'Usuário';
-  const dia = document.getElementById('ob_dia').value;
-  const mes = document.getElementById('ob_mes').value;
-  const ano = document.getElementById('ob_ano').value;
-  U.nasc    = `${ano}-${String(mes).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
-  const ageMs = new Date() - new Date(U.nasc);
-  U.idade   = Math.floor(ageMs/(365.25*24*3600*1000));
-  if (isNaN(U.idade)||U.idade<5||U.idade>120) U.idade=25;
-  U.sexo    = document.getElementById('ob_sexo').value || 'Não informado';
-  U.altura  = document.getElementById('ob_alt').value || '170';
-  U.peso    = document.getElementById('pesoSli').value;
-  U.metaPeso= document.getElementById('metaSli').value;
-  const gEl = document.querySelector('#gOpts .opt.sel');
-  U.objetivo= gEl ? gEl.querySelector('.optN').textContent : 'Ganhar massa';
-  const lEl = document.querySelector('#lvlOpts .opt.sel');
-  U.nivel   = lEl ? lEl.querySelector('.optN').textContent : 'Intermediário';
-  const loEl= document.querySelector('#localOpts .opt.sel');
-  U.local   = loEl ? loEl.querySelector('.optN').textContent : 'Academia';
-  const frEl= document.querySelector('#frOpts .opt.sel');
-  U.freq    = frEl ? frEl.querySelector('.optN').textContent : '3–4 dias/semana';
-  const dEl = document.querySelector('#dietOpts .opt.sel');
-  U.dieta   = dEl ? dEl.querySelector('.optN').textContent : 'Sem restrições';
-  U.ngosta  = (document.getElementById('ob_ngosta').value||'').trim() || 'nada';
-  const emEl= document.querySelector('#empOpts .opt.sel');
-  U.emprego = emEl ? emEl.querySelector('.optN').textContent : 'Não informado';
-  U.renda   = document.getElementById('ob_renda').value;
-  U.onboarded = true;
   DB.set('u:'+U.email, U);
-  DB.set('session', U.email);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  GERAÇÃO IA
-// ═══════════════════════════════════════════════════════════════
-async function rodarGeracao() {
-  mostrar('pgGen');
-  if (U.plan === 'free') { await sleep(1200); iniciarApp(); return; }
-
-  markGen(0,'Analisando perfil e objetivos...');
-  await sleep(900); doneGen(0);
-
-  markGen(1,'Gerando plano alimentar semanal...');
-  const dieta = await gerarDieta();
-  DB.set('d:'+U.email, dieta); doneGen(1); await sleep(300);
-
-  markGen(2,'Criando plano de treinos...');
-  const treino = await gerarTreino();
-  DB.set('w:'+U.email, treino); doneGen(2); await sleep(300);
-
-  markGen(3,'Configurando metas iniciais...');
-  await sleep(600);
-  DB.set('g:'+U.email, gerarMetasIniciais()); doneGen(3);
-  await sleep(500);
-  iniciarApp();
-}
-
-function markGen(i, txt) {
-  document.getElementById('genCur').textContent = txt;
-  const el = document.getElementById('gi'+i);
-  el.querySelector('.giTxt').style.color = 'var(--lime)';
-  el.querySelector('.giCk').textContent  = '◌';
-}
-function doneGen(i) {
-  const el = document.getElementById('gi'+i);
-  el.classList.add('done');
-  el.querySelector('.giCk').textContent = '✓';
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  API ANTHROPIC
-// ═══════════════════════════════════════════════════════════════
-async function callAI(prompt, maxTok=2000) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
-    body: JSON.stringify({
-      model:'claude-sonnet-4-5',
-      max_tokens: maxTok,
-      messages:[{role:'user', content:prompt}]
-    })
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error?.message||'API error');
-  return data.content.map(x=>x.text||'').join('');
-}
-
-async function gerarDieta() {
-  try {
-    const txt = await callAI(`Nutricionista especializado. Crie plano alimentar 7 dias para:
-Peso: ${U.peso}kg → meta: ${U.metaPeso}kg, Altura: ${U.altura}cm, Idade: ${U.idade}a, Sexo: ${U.sexo}
-Objetivo: ${U.objetivo}, Treino: ${U.freq}, Local: ${U.local}
-Dieta: ${U.dieta}, Não gosta: ${U.ngosta}
-Retorne SOMENTE JSON válido sem markdown:
-{"meta_kcal":2200,"meta_prot":160,"meta_carbo":220,"meta_gord":65,"dias":[{"dia":"Segunda","ref":[{"tipo":"Café da manhã","nome":"Ovos mexidos","kcal":380,"prot":28,"carbo":30,"gord":14},{"tipo":"Almoço","nome":"Frango com arroz","kcal":580,"prot":50,"carbo":60,"gord":12},{"tipo":"Jantar","nome":"Atum com batata","kcal":480,"prot":42,"carbo":50,"gord":10},{"tipo":"Lanche","nome":"Iogurte grego","kcal":220,"prot":18,"carbo":22,"gord":5}]},{"dia":"Terça","ref":[...]},{"dia":"Quarta","ref":[...]},{"dia":"Quinta","ref":[...]},{"dia":"Sexta","ref":[...]},{"dia":"Sábado","ref":[...]},{"dia":"Domingo","ref":[...]}]}`);
-    return JSON.parse(txt.replace(/```json\n?|\n?```/g,'').trim());
-  } catch(e) { return fbDieta(); }
-}
-
-async function gerarTreino() {
-  try {
-    const txt = await callAI(`Personal trainer. Crie plano treino semanal:
-Objetivo: ${U.objetivo}, Nível: ${U.nivel}, Frequência: ${U.freq}, Local: ${U.local}
-Retorne SOMENTE JSON válido sem markdown:
-{"dias":[{"dia":"Segunda","tipo":"treino","nome":"Peito e Tríceps","duracao":60,"exer":[{"nome":"Supino Reto","series":4,"reps":"10-12","descanso":"60s"}]},{"dia":"Terça","tipo":"treino","nome":"Costas","duracao":60,"exer":[...]},{"dia":"Quarta","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Quinta","tipo":"treino","nome":"Pernas","duracao":70,"exer":[...]},{"dia":"Sexta","tipo":"treino","nome":"Ombro","duracao":55,"exer":[...]},{"dia":"Sábado","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]},{"dia":"Domingo","tipo":"descanso","nome":"Descanso","duracao":0,"exer":[]}]}`);
-    return JSON.parse(txt.replace(/```json\n?|\n?```/g,'').trim());
-  } catch(e) { return fbTreino(); }
-}
-
-function gerarMetasIniciais() {
-  const dif = Math.abs((+U.peso||75)-(+U.metaPeso||68));
-  return [
-    {id:Date.now()+1, name:`Atingir ${U.metaPeso}kg`, days:Math.max(30,dif*14), cat:'fitness', date:hoje(), pct:0, done:false},
-    {id:Date.now()+2, name:'Completar 4 treinos esta semana', days:7, cat:'fitness', date:hoje(), pct:0, done:false},
-    {id:Date.now()+3, name:'Seguir a dieta por 30 dias', days:30, cat:'saúde', date:hoje(), pct:0, done:false},
-  ];
-}
-
-function fbDieta() {
-  const base = [
-    [{tipo:'Café da manhã',nome:'Ovos mexidos com aveia',kcal:390,prot:28,carbo:38,gord:13},
-     {tipo:'Almoço',nome:'Frango grelhado com arroz integral',kcal:590,prot:52,carbo:62,gord:12},
-     {tipo:'Jantar',nome:'Atum com batata-doce',kcal:480,prot:42,carbo:52,gord:10},
-     {tipo:'Lanche',nome:'Iogurte grego com banana',kcal:230,prot:18,carbo:28,gord:5}],
-    [{tipo:'Café da manhã',nome:'Panqueca de banana com whey',kcal:360,prot:30,carbo:40,gord:8},
-     {tipo:'Almoço',nome:'Carne moída com feijão e arroz',kcal:640,prot:50,carbo:68,gord:16},
-     {tipo:'Jantar',nome:'Salmão com quinoa e legumes',kcal:540,prot:46,carbo:46,gord:18},
-     {tipo:'Lanche',nome:'Castanhas e maçã',kcal:210,prot:6,carbo:24,gord:12}],
-    [{tipo:'Café da manhã',nome:'Omelete de 3 ovos com queijo',kcal:350,prot:26,carbo:6,gord:24},
-     {tipo:'Almoço',nome:'Tilápia com purê de batata-doce',kcal:560,prot:48,carbo:58,gord:11},
-     {tipo:'Jantar',nome:'Frango assado com legumes',kcal:490,prot:46,carbo:38,gord:14},
-     {tipo:'Lanche',nome:'Whey shake com leite',kcal:270,prot:30,carbo:20,gord:6}],
-  ];
-  const dias = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado','Domingo'];
-  return {meta_kcal:2200,meta_prot:160,meta_carbo:220,meta_gord:65,
-    dias:dias.map((dia,i)=>({dia,ref:base[i%base.length]}))};
-}
-
-function fbTreino() {
-  return {dias:[
-    {dia:'Segunda',tipo:'treino',nome:'Peito e Tríceps',duracao:60,exer:[
-      {nome:'Supino Reto',series:4,reps:'10-12',descanso:'60s'},
-      {nome:'Supino Inclinado',series:3,reps:'12',descanso:'60s'},
-      {nome:'Crucifixo',series:3,reps:'15',descanso:'45s'},
-      {nome:'Tríceps Corda',series:3,reps:'15',descanso:'45s'},
-      {nome:'Tríceps Testa',series:3,reps:'12',descanso:'45s'}]},
-    {dia:'Terça',tipo:'treino',nome:'Costas e Bíceps',duracao:60,exer:[
-      {nome:'Remada Curvada',series:4,reps:'10-12',descanso:'60s'},
-      {nome:'Puxada Frontal',series:3,reps:'12',descanso:'60s'},
-      {nome:'Remada Unilateral',series:3,reps:'12',descanso:'60s'},
-      {nome:'Rosca Direta',series:3,reps:'12',descanso:'45s'},
-      {nome:'Rosca Martelo',series:3,reps:'12',descanso:'45s'}]},
-    {dia:'Quarta',tipo:'descanso',nome:'Descanso ativo',duracao:30,exer:[]},
-    {dia:'Quinta',tipo:'treino',nome:'Pernas e Glúteos',duracao:70,exer:[
-      {nome:'Agachamento Livre',series:4,reps:'10-12',descanso:'90s'},
-      {nome:'Leg Press',series:3,reps:'15',descanso:'60s'},
-      {nome:'Stiff',series:3,reps:'12',descanso:'60s'},
-      {nome:'Cadeira Extensora',series:3,reps:'15',descanso:'45s'},
-      {nome:'Panturrilha em Pé',series:4,reps:'20',descanso:'30s'}]},
-    {dia:'Sexta',tipo:'treino',nome:'Ombro e Abdômen',duracao:55,exer:[
-      {nome:'Desenvolvimento',series:4,reps:'10-12',descanso:'60s'},
-      {nome:'Elevação Lateral',series:3,reps:'15',descanso:'45s'},
-      {nome:'Elevação Frontal',series:3,reps:'15',descanso:'45s'},
-      {nome:'Crunch',series:4,reps:'20',descanso:'30s'},
-      {nome:'Prancha',series:3,reps:'60s',descanso:'30s'}]},
-    {dia:'Sábado',tipo:'descanso',nome:'Descanso',duracao:0,exer:[]},
-    {dia:'Domingo',tipo:'descanso',nome:'Descanso',duracao:0,exer:[]}
-  ]};
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  INICIAR APP
-// ═══════════════════════════════════════════════════════════════
-function iniciarApp() {
-  DB.set('session', U.email);
-  DB.set('u:'+U.email, U);
-  mostrar('pgApp');
-  const dd=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
-  const mm=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-  const n=new Date();
-  document.getElementById('heroDate').textContent=`${dd[n.getDay()]}, ${n.getDate()} ${mm[n.getMonth()]} ${n.getFullYear()}`;
   atualizarPerfil();
   renderHome();
-  renderDieta();
-  renderTreino();
-  renderFinancas();
-  renderMetas();
-}
+  closeMov('mEditPerfil');
+  toast('Perfil atualizado! ✓');
 
-function atualizarPerfil() {
-  const nm = U.nome||'—';
-  const ini = nm.trim().split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2)||'R';
-  document.getElementById('avBtn').textContent       = ini[0];
-  document.getElementById('profAvEl').textContent    = ini;
-  document.getElementById('heroName').textContent    = nm;
-  document.getElementById('profNameEl').textContent  = nm;
-  document.getElementById('profMetaEl').textContent  = (U.email||'')+'  ·  Rimu.io';
-  document.getElementById('stPeso').textContent      = U.peso||'—';
-  document.getElementById('stMeta').textContent      = U.metaPeso||'—';
-  document.getElementById('stIdade').textContent     = U.idade||'—';
-  document.getElementById('profGoal').textContent    = U.objetivo||'—';
-  document.getElementById('profLvl').textContent     = U.nivel||'—';
-  document.getElementById('profEmp').textContent     = U.emprego||'—';
-  document.getElementById('profPlan').textContent    = U.plan==='pro' ? '⭐ PRO — Plano completo com IA' : '🆓 FREE — Apenas finanças';
-  const tag = document.getElementById('planTag');
-  tag.textContent = U.plan==='pro' ? 'PRO' : 'FREE';
-  tag.className   = 'planTag '+(U.plan==='pro'?'ptPro':'ptFree');
-  document.getElementById('upgBtn').style.display = U.plan==='pro'?'none':'block';
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  NAVEGAÇÃO
-// ═══════════════════════════════════════════════════════════════
-function goTab(t) {
-  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
-  document.querySelectorAll('.nv').forEach(n=>n.classList.remove('on'));
-  const scr = document.getElementById('scr-'+t);
-  const nav = document.getElementById('nv-'+t);
-  if(scr) scr.classList.add('on');
-  if(nav) nav.classList.add('on');
-}
-
-function navPro(t) {
-  if (U.plan !== 'pro') { openMov('mPay'); return; }
-  goTab(t);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  HOME
-// ═══════════════════════════════════════════════════════════════
-function renderHome() {
-  const meals = DB.get('m:'+U.email)||[];
-  const txs   = DB.get('t:'+U.email)||[];
-  const wks   = DB.get('k:'+U.email)||[];
-  const goals = DB.get('g:'+U.email)||[];
-  const tod   = hoje();
-
-  const todM  = meals.filter(m=>m.date===tod);
-  const totK  = todM.reduce((s,m)=>s+(+m.kcal||0),0);
-  const totIn = txs.filter(t=>t.type==='receita').reduce((s,t)=>s+(+t.val||0),0);
-  const totOut= txs.filter(t=>t.type==='despesa').reduce((s,t)=>s+(+t.val||0),0);
-  const saldo = totIn-totOut;
-  const weekW = wks.filter(w=>w.date>=segunda()).length;
-  const todW  = wks.some(w=>w.date===tod);
-
-  document.getElementById('hKcal').textContent   = totK>0?totK:'—';
-  document.getElementById('hTreino').textContent = weekW>0?weekW+'x':'—';
-  document.getElementById('hSaldo').textContent  = (totIn+totOut)>0?'R$'+Math.abs(saldo).toFixed(0):'—';
-  document.getElementById('hMetas').textContent  = goals.length>0?goals.filter(g=>!g.done).length+'/'+goals.length:'—';
-  document.getElementById('heroSub').textContent = weekW>0?`${weekW} treino(s) essa semana 💪`:'Comece registrando seu primeiro dia!';
-
-  let prog=0;
-  if(totK>0) prog+=33;
-  if(todW)   prog+=33;
-  if(txs.length>0) prog+=34;
-  document.getElementById('homeProg').style.width = prog+'%';
-  document.getElementById('homePct').textContent  = prog+'%';
-
-  // Streak
-  const dLbls=['D','S','T','Q','Q','S','S'];
-  const now=new Date(); let sh='<div class="strR">';
-  for(let i=6;i>=0;i--){
-    const d=new Date(now); d.setDate(now.getDate()-i);
-    const ds=dStr(d);
-    const ativo=wks.some(w=>w.date===ds)||meals.some(m=>m.date===ds);
-    const isHoje=ds===tod;
-    sh+=`<div class="sd ${isHoje?'sdT':ativo?'sdY':'sdN'}">${dLbls[d.getDay()]}</div>`;
-  }
-  let streak=0; const dd=new Date();
-  for(let i=0;i<365;i++){const ds=dStr(dd);if(wks.some(w=>w.date===ds)||meals.some(m=>m.date===ds)){streak++;dd.setDate(dd.getDate()-1);}else break;}
-  sh+=`</div><div style="font-size:11px;color:var(--dim);margin-top:8px">${streak>0?`🔥 ${streak} dia${streak>1?'s':''} seguido${streak>1?'s':''}`:'Comece hoje!'}</div>`;
-  document.getElementById('streakArea').innerHTML=sh;
-
-  // Treino de hoje
-  const hwEl=document.getElementById('homeWorkout');
-  const wplan=DB.get('w:'+U.email);
-  const dow=new Date().toLocaleDateString('pt-BR',{weekday:'long'});
-  const pd=wplan?wplan.dias.find(d=>dow.toLowerCase().slice(0,3)===d.dia.toLowerCase().slice(0,3)):null;
-  if(pd){
-    const done=wks.some(w=>w.date===tod);
-    const isRest=pd.tipo==='descanso';
-    hwEl.innerHTML=`<div class="wd"><div class="wdn ${done?'wdnY':isRest?'wdnR':'wdnT'}">${pd.nome[0]}</div>
-      <div style="flex:1"><div style="font-size:13px;font-weight:600">${pd.nome}</div>
-        <div style="font-size:11px;color:var(--dim);margin-top:2px">${pd.duracao} min${!isRest?' · '+(pd.exer?.length||0)+' exercícios':''}</div>
-      </div><span class="tag ${done?'tl':isRest?'ts':'tg'}">${done?'✓ FEITO':isRest?'😴':'▶ HOJE'}</span></div>`;
-  } else {
-    hwEl.innerHTML=`<div class="empty"><div class="ei">💪</div><div class="et">Nenhum treino ainda</div></div>`;
-  }
-
-  // Finanças
-  const hfEl=document.getElementById('homeFinance');
-  if(!txs.length){hfEl.innerHTML=`<div class="empty"><div class="ei">💰</div><div class="et">Nenhuma transação</div></div>`;return;}
-  const ic={alimentação:'🛒',saúde:'🏋️',moradia:'🏠',lazer:'🎭',transporte:'🚗',investimento:'📈',outros:'💸'};
-  hfEl.innerHTML=`<div class="card" style="padding:4px 12px">${txs.slice(-3).reverse().map(t=>
-    `<div class="tx"><div class="txIco" style="background:rgba(${t.type==='receita'?'61,255,200':'255,87,87'},.12)">${ic[t.cat]||'💸'}</div>
-      <div class="txB"><div class="txN">${t.desc}</div><div class="txC">${t.cat}</div></div>
-      <div class="txA ${t.type==='receita'?'txIn':'txOut'}">${t.type==='receita'?'+':'-'}R$${(+t.val).toFixed(0)}</div>
-    </div>`).join('')}</div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  DIETA
-// ═══════════════════════════════════════════════════════════════
-function renderDieta() {
-  const el=document.getElementById('dietaContent');
-  if(U.plan!=='pro'){
-    el.innerHTML=`<div class="locked"><div class="lockIco">🔒</div><div class="lockTtl">Plano Alimentar IA</div>
-      <div class="lockSub">Exclusivo PRO. A IA cria um plano completo de 7 dias baseado no seu perfil.</div>
-      <button class="upgBtn" onclick="openMov('mPay')">⬆️ Fazer upgrade para PRO</button></div>`;
-    return;
-  }
-  const plan=DB.get('d:'+U.email);
-  const meals=DB.get('m:'+U.email)||[];
-  const tod=hoje();
-  const todM=meals.filter(m=>m.date===tod);
-  const totK=todM.reduce((s,m)=>s+(+m.kcal||0),0);
-  const totP=todM.reduce((s,m)=>s+(+m.prot||0),0);
-  const totC=todM.reduce((s,m)=>s+(+m.carbo||0),0);
-  const metaK=plan?plan.meta_kcal:2200;
-  const pct=Math.min(100,Math.round((totK/metaK)*100));
-  const dow=new Date().toLocaleDateString('pt-BR',{weekday:'long'});
-  const pd=plan?plan.dias.find(d=>dow.toLowerCase().slice(0,3)===d.dia.toLowerCase().slice(0,3)):null;
-
-  let html=`<div class="card cm"><div class="clbl">Calorias de hoje</div>
-    <div style="display:flex;align-items:flex-end;gap:7px"><div class="cbig" style="color:var(--mint)">${totK}</div>
-      <div style="font-size:16px;color:var(--dim);margin-bottom:7px">kcal</div></div>
-    <div style="font-size:12px;color:var(--dim);margin-top:3px">Meta: ${metaK} kcal · ${pct}% consumido</div>
-    <div class="pbarW"><div class="prow"><span>Consumido</span><span>Meta: ${metaK}</span></div>
-      <div class="pbar"><div class="pfill pMint" style="width:${pct}%"></div></div></div></div>
-  <div class="g2">
-    <div class="mini" style="border-left:3px solid var(--mint)">
-      <div style="font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">PROTEÍNA</div>
-      <div class="mv" style="color:var(--mint)">${totP}G</div><div class="mlb">meta: ${plan?.meta_prot||160}g</div></div>
-    <div class="mini" style="border-left:3px solid var(--gold)">
-      <div style="font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px">CARBO</div>
-      <div class="mv" style="color:var(--gold)">${totC}G</div><div class="mlb">meta: ${plan?.meta_carbo||220}g</div></div>
-  </div>`;
-
-  if(pd){
-    html+=`<div class="secH"><div class="secT">🤖 Plano de hoje (IA)</div><div class="secA" onclick="openMov('mRec')">+ receita</div></div>`;
-    pd.ref.forEach(r=>{
-      const done=todM.some(m=>m.name===r.nome);
-      html+=`<div class="mealIt"><div>
-        <div class="mealN">${mIco(r.tipo)} ${r.nome}</div>
-        <div class="mealD">${r.tipo} · P:${r.prot}g C:${r.carbo}g G:${r.gord}g</div></div>
-        <div style="text-align:right">
-          <div class="mealK">${r.kcal}</div>
-          <div style="font-size:9px;color:var(--dim)">KCAL</div>
-          ${done?'<div style="color:var(--lime);font-size:11px;margin-top:4px">✓ feito</div>'
-            :`<button onclick="qAdd('${r.nome.replace(/'/g,"&#39;")}',${r.kcal},${r.prot},${r.carbo},${r.gord},'${r.tipo}')"
-              style="font-size:10px;color:var(--lime);background:none;border:none;cursor:pointer;margin-top:4px;font-family:inherit">+ add</button>`}
-        </div></div>`;
-    });
-  }
-
-  html+=`<div class="secH"><div class="secT">📸 FotoCal</div><div class="secA" onclick="openMov('mPhoto')">abrir →</div></div>
-  <div class="pdrop" onclick="openMov('mPhoto')">
-    <div style="font-size:38px">📷</div><div style="font-size:14px;font-weight:700">Fotografar refeição</div>
-    <div style="font-size:12px;color:var(--dim)">IA detecta calorias automaticamente</div></div>
-  <div class="secT">Adicionar manualmente</div>
-  <div class="aform">
-    <div class="fg"><div class="fl">Refeição</div><input class="fi" id="mealName" placeholder="Ex: Frango com arroz"></div>
-    <div class="r2">
-      <div class="fg"><div class="fl">Calorias</div><input class="fi" id="mealKcal" type="number" placeholder="480" inputmode="numeric"></div>
-      <div class="fg"><div class="fl">Proteína (g)</div><input class="fi" id="mealProt" type="number" placeholder="40" inputmode="numeric"></div>
-    </div>
-    <div class="r2">
-      <div class="fg"><div class="fl">Carbo (g)</div><input class="fi" id="mealCarbo" type="number" placeholder="55" inputmode="numeric"></div>
-      <div class="fg"><div class="fl">Gordura (g)</div><input class="fi" id="mealGord" type="number" placeholder="10" inputmode="numeric"></div>
-    </div>
-    <div class="fg"><div class="fl">Tipo</div>
-      <select class="fi" id="mealTipo"><option>Café da manhã</option><option>Almoço</option><option>Jantar</option>
-        <option>Lanche</option><option>Pré-treino</option><option>Pós-treino</option></select></div>
-    <button class="btnG" onclick="addMeal()">Adicionar refeição</button>
-  </div>`;
-
-  if(plan){
-    html+=`<div class="secT">📅 Plano semanal completo</div>`;
-    plan.dias.forEach(d=>{
-      const totD=d.ref.reduce((s,r)=>s+(r.kcal||0),0);
-      html+=`<div class="card"><div class="clbl">${d.dia}</div>
-        <div style="font-size:12px;font-weight:700;margin-bottom:8px;color:var(--coral)">${totD} kcal</div>
-        ${d.ref.map(r=>`<div class="mealIt" style="margin-bottom:6px;padding:9px">
-          <div><div class="mealN" style="font-size:12px">${mIco(r.tipo)} ${r.nome}</div>
-            <div class="mealD">${r.tipo}</div></div>
-          <div class="mealK" style="font-size:16px">${r.kcal}</div></div>`).join('')}</div>`;
-    });
-  }
-  el.innerHTML=html;
-}
-
-function mIco(t){return{'Café da manhã':'☀️','Almoço':'🌤️','Jantar':'🌙','Lanche':'🍎','Pré-treino':'⚡','Pós-treino':'💪'}[t]||'🍽️';}
-
-function addMeal(){
-  const name=(document.getElementById('mealName').value||'').trim();
-  const kcal=document.getElementById('mealKcal').value;
-  if(!name||!kcal){toast('Preencha nome e calorias');return;}
-  DB.push('m:'+U.email,{id:Date.now(),name,kcal:+kcal,
-    prot:+(document.getElementById('mealProt').value)||0,
-    carbo:+(document.getElementById('mealCarbo').value)||0,
-    gord:+(document.getElementById('mealGord').value)||0,
-    tipo:document.getElementById('mealTipo').value,date:hoje()});
-  ['mealName','mealKcal','mealProt','mealCarbo','mealGord'].forEach(id=>document.getElementById(id).value='');
-  toast('Refeição adicionada! ✓'); renderDieta(); renderHome();
-}
-
-function qAdd(name,kcal,prot,carbo,gord,tipo){
-  DB.push('m:'+U.email,{id:Date.now(),name,kcal,prot,carbo,gord,tipo,date:hoje()});
-  toast(name+' adicionado! ✓'); renderDieta(); renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  TREINO
-// ═══════════════════════════════════════════════════════════════
-function renderTreino(){
-  const el=document.getElementById('treinoContent');
-  if(U.plan!=='pro'){
-    el.innerHTML=`<div class="locked"><div class="lockIco">🔒</div><div class="lockTtl">Plano de Treino IA</div>
-      <div class="lockSub">Disponível no PRO. A IA cria um plano semanal adaptado ao seu nível e local de treino.</div>
-      <button class="upgBtn" onclick="openMov('mPay')">⬆️ Fazer upgrade</button></div>`;
-    return;
-  }
-  const plan=DB.get('w:'+U.email);
-  const wks=DB.get('k:'+U.email)||[];
-  const tod=hoje();
-  const dow=new Date().toLocaleDateString('pt-BR',{weekday:'long'});
-  let html='';
-  if(plan){
-    html+=`<div class="secT">📅 Plano da semana (IA)</div>`;
-    plan.dias.forEach(d=>{
-      const done=wks.some(w=>w.date===tod&&w.grupo===d.nome);
-      const isHoje=dow.toLowerCase().slice(0,3)===d.dia.toLowerCase().slice(0,3);
-      const isRest=d.tipo==='descanso';
-      html+=`<div class="wd" onclick="${!isRest?`showWD('${d.dia}')`:''}" style="${isRest?'cursor:default':''}">
-        <div class="wdn ${isHoje?'wdnT':done?'wdnY':isRest?'wdnR':'wdnF'}">${d.nome[0]}</div>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600">${d.nome}</div>
-          <div style="font-size:11px;color:var(--dim);margin-top:2px">${d.dia}${!isRest?' · '+d.duracao+' min · '+(d.exer?.length||0)+' exercícios':''}</div>
-        </div><span class="tag ${isHoje?'tg':done?'tl':isRest?'ts':''}">${isHoje?'HOJE':done?'✓ FEITO':isRest?'😴':''}</span></div>`;
-    });
-  }
-  const hist=wks.slice(-5).reverse();
-  if(hist.length){
-    html+=`<div class="secT" style="margin-top:4px">Histórico</div>`;
-    hist.forEach(w=>{
-      html+=`<div class="wd"><div class="wdn wdnY">${w.grupo[0]}</div>
-        <div style="flex:1"><div style="font-size:13px;font-weight:600">${w.grupo}</div>
-          <div style="font-size:11px;color:var(--dim);margin-top:2px">${w.date===tod?'Hoje':fmtDate(w.date)} · ${w.dur} min</div>
-        </div><span class="tag tl">✓</span></div>`;
-    });
-  } else {
-    html+=`<div class="empty"><div class="ei">💪</div><div class="et">Nenhum treino registrado</div><div class="es">Toque em um dia do plano para marcar</div></div>`;
-  }
-  el.innerHTML=html;
-  const lm={'Iniciante':['tg','🌱'],'Intermediário':['tg','⚡'],'Avançado':['tc','🔥']};
-  const lk=Object.keys(lm).find(k=>(U.nivel||'').includes(k))||'Intermediário';
-  const ltag=document.getElementById('lvlTag');
-  ltag.textContent=`${lm[lk][1]} ${lk}`; ltag.className='tag '+lm[lk][0];
-}
-
-function showWD(diaName){
-  const plan=DB.get('w:'+U.email); if(!plan) return;
-  const d=plan.dias.find(x=>x.dia===diaName); if(!d||d.tipo==='descanso') return;
-  const mid='mW'+Date.now();
-  let html=`<div class="mdlH"></div><div class="mdlT">${d.nome} 💪</div>
-    <div style="display:flex;gap:8px;margin-bottom:14px">
-      <span class="tag tg">${d.dia}</span><span class="tag ts">${d.duracao} min</span></div>
-    <div style="display:flex;flex-direction:column;gap:9px">`;
-  d.exer.forEach(ex=>{
-    const ytQ = encodeURIComponent(ex.nome + ' exercício como fazer');
-    const ytUrl = 'https://www.youtube.com/results?search_query=' + ytQ;
-    html+=`<div class="card" style="background:var(--sur2);padding:12px">
-      <div style="display:flex;align-items:center;justify-content:space-between">
-        <div style="font-size:13px;font-weight:700">${ex.nome}</div>
-        <a href="${ytUrl}" target="_blank" style="display:inline-flex;align-items:center;gap:4px;background:#ff0000;color:#fff;border-radius:6px;padding:4px 9px;font-size:10px;font-weight:700;text-decoration:none;letter-spacing:.5px;font-family:'Share Tech Mono',monospace">▶ VER</a>
-      </div>
-      <div style="font-size:11px;color:var(--dim);margin-top:5px">${ex.series} séries · ${ex.reps} reps · ${ex.descanso||'60s'} descanso</div></div>`;
-  });
-  html+=`</div><button class="btnG" style="margin-top:14px" onclick="markWDone('${d.nome}','${mid}')">✓ Marcar como feito</button>`;
-  const mov=document.createElement('div'); mov.className='mov on'; mov.id=mid;
-  mov.innerHTML=`<div class="mdl">${html}</div>`;
-  mov.onclick=ev=>{if(ev.target===mov)mov.remove();};
-  document.body.appendChild(mov);
-}
-
-function markWDone(nome,mid){
-  const wks=DB.get('k:'+U.email)||[];
-  if(!wks.some(x=>x.date===hoje()&&x.grupo===nome))
-    DB.push('k:'+U.email,{id:Date.now(),grupo:nome,dur:60,ser:20,date:hoje()});
-  document.getElementById(mid)?.remove();
-  toast('Treino concluído! 🎉'); renderTreino(); renderHome();
-}
-
-function addWorkout(){
-  const g=document.getElementById('wGrupo').value;
-  const dur=+(document.getElementById('wDur').value)||60;
-  const ser=+(document.getElementById('wSer').value)||20;
-  DB.push('k:'+U.email,{id:Date.now(),grupo:g,dur,ser,date:hoje()});
-  document.getElementById('wDur').value=''; document.getElementById('wSer').value='';
-  toast('Treino registrado! 💪'); renderTreino(); renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  FINANÇAS
-// ═══════════════════════════════════════════════════════════════
-function renderFinancas(){
-  const txs=DB.get('t:'+U.email)||[];
-  const totIn =txs.filter(t=>t.type==='receita').reduce((s,t)=>s+(+t.val||0),0);
-  const totOut=txs.filter(t=>t.type==='despesa').reduce((s,t)=>s+(+t.val||0),0);
-  document.getElementById('finTotal').textContent='R$'+(totIn-totOut).toFixed(2);
-  document.getElementById('finIn').textContent='+R$'+totIn.toFixed(2);
-  document.getElementById('finOut').textContent='-R$'+totOut.toFixed(2);
-  const listEl=document.getElementById('txList');
-  const emEl=document.getElementById('txEmpty');
-  if(!txs.length){emEl.style.display='block';listEl.style.display='none';return;}
-  emEl.style.display='none'; listEl.style.display='block';
-  const ic={alimentação:'🛒',saúde:'🏋️',moradia:'🏠',lazer:'🎭',transporte:'🚗',investimento:'📈',outros:'💸'};
-  listEl.innerHTML=txs.slice().reverse().map(t=>
-    `<div class="tx"><div class="txIco" style="background:rgba(${t.type==='receita'?'61,255,200':'255,87,87'},.12)">${ic[t.cat]||'💸'}</div>
-      <div class="txB"><div class="txN">${t.desc}</div><div class="txC">${t.cat} · ${fmtDate(t.date)}</div></div>
-      <div class="txA ${t.type==='receita'?'txIn':'txOut'}">${t.type==='receita'?'+':'-'}R$${(+t.val).toFixed(2)}</div>
-    </div>`).join('');
-}
-
-function addTx(){
-  const desc=(document.getElementById('txDesc').value||'').trim();
-  const val=document.getElementById('txVal').value;
-  if(!desc||!val){toast('Preencha todos os campos');return;}
-  DB.push('t:'+U.email,{id:Date.now(),desc,val:+val,
-    type:document.getElementById('txType').value,
-    cat:document.getElementById('txCat').value,date:hoje()});
-  document.getElementById('txDesc').value=''; document.getElementById('txVal').value='';
-  toast('Registrado! ✓'); renderFinancas(); renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  METAS
-// ═══════════════════════════════════════════════════════════════
-function renderMetas(){
-  if(U.plan!=='pro'){
-    document.getElementById('goalsList').innerHTML=`<div class="locked">
-      <div class="lockIco">🔒</div><div class="lockTtl">Metas Avançadas</div>
-      <div class="lockSub">Disponível no PRO.</div>
-      <button class="upgBtn" onclick="openMov('mPay')">⬆️ Fazer upgrade</button></div>`;
-    document.getElementById('metasTags').innerHTML='<span class="tag tc">🔒 PRO</span>';
-    return;
-  }
-  const goals=DB.get('g:'+U.email)||[];
-  const active=goals.filter(g=>!g.done).length;
-  document.getElementById('metasTags').innerHTML=
-    `<span class="tag tm">${active} ativa${active!==1?'s':''}</span>
-     ${goals.filter(g=>g.done).length?`<span class="tag tl">${goals.filter(g=>g.done).length} concluída(s)</span>`:''}`;
-  const el=document.getElementById('goalsList');
-  if(!goals.length){el.innerHTML=`<div class="empty"><div class="ei">🎯</div><div class="et">Nenhuma meta</div></div>`;return;}
-  const ci={fitness:'🏋️',saúde:'❤️',finanças:'💰',mental:'🧘',outros:'🎯'};
-  el.innerHTML=goals.map(g=>`<div class="goalC" style="${g.done?'opacity:.5':''}">
-    <div class="goalH">
-      <div><div class="goalN">${ci[g.cat]||'🎯'} ${g.name}</div>
-        <div class="goalI">${g.days} dias · ${fmtDate(g.date)}</div></div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <div class="goalP">${g.pct}%</div>
-        <span style="cursor:pointer;font-size:18px" onclick="toggleGoal(${g.id})">${g.done?'↩️':'✓'}</span>
-      </div></div>
-    <div class="pbar"><div class="pfill pLime" style="width:${g.pct}%"></div></div>
-  </div>`).join('');
-}
-
-function addGoal(){
-  if(U.plan!=='pro'){openMov('mPay');return;}
-  const name=(document.getElementById('gName').value||'').trim();
-  if(!name){toast('Dê um nome à meta');return;}
-  DB.push('g:'+U.email,{id:Date.now(),name,
-    days:+(document.getElementById('gDays').value)||30,
-    cat:document.getElementById('gCat').value,date:hoje(),pct:0,done:false});
-  document.getElementById('gName').value='';
-  toast('Meta criada! 🎯'); renderMetas(); renderHome();
-}
-
-function toggleGoal(id){
-  const goals=DB.get('g:'+U.email)||[];
-  const g=goals.find(x=>x.id===id);
-  if(g){g.done=!g.done;g.pct=g.done?100:0;}
-  DB.set('g:'+U.email,goals); renderMetas(); renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  AI CHAT
-// ═══════════════════════════════════════════════════════════════
-async function sendChat(){
-  if(U.plan!=='pro'){openMov('mPay');return;}
-  const inp=document.getElementById('cinp');
-  const msg=(inp.value||'').trim(); if(!msg) return;
-  inp.value='';
-  appendMsg(msg,'u');
-  const tid=showTyping();
-  try{
-    const meals=DB.get('m:'+U.email)||[];
-    const wks=DB.get('k:'+U.email)||[];
-    const tod=hoje();
-    const todK=meals.filter(m=>m.date===tod).reduce((s,m)=>s+(+m.kcal||0),0);
-    const weekW=wks.filter(w=>w.date>=segunda()).length;
-    const ctx=`Você é o assistente do Rimu.io. Usuário: ${U.nome}, ${U.idade}a, ${U.peso}kg→meta ${U.metaPeso}kg, objetivo: ${U.objetivo}, nível: ${U.nivel}, local: ${U.local}. Hoje: ${todK}kcal. Treinos esta semana: ${weekW}.`;
-    const txt=await callAI(`${ctx}\nPergunta: ${msg}\nResponda em português, max 180 palavras, use emojis, seja motivador.`,1000);
-    removeTyping(tid); appendMsg(txt,'a');
-  } catch(e){ removeTyping(tid); appendMsg('Ops! Erro técnico. Tente novamente 🛠️','a'); }
-}
-
-function sendQ(m){
-  if(U.plan!=='pro'){openMov('mPay');return;}
-  document.getElementById('cinp').value=m; sendChat();
-}
-
-function appendMsg(text,from){
-  const msgs=document.getElementById('chatMsgs');
-  const now=new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
-  msgs.insertAdjacentHTML('beforeend',from==='u'
-    ?`<div class="msg msgU"><div class="msgB">${esc(text)}</div><div class="msgT">${now}</div></div>`
-    :`<div class="msg msgA"><div class="aiAv">RI</div><div class="msgB">${text}</div><div class="msgT">${now}</div></div>`);
-  msgs.scrollTop=msgs.scrollHeight;
-}
-
-function showTyping(){
-  const msgs=document.getElementById('chatMsgs');
-  const id='ty'+Date.now();
-  msgs.insertAdjacentHTML('beforeend',
-    `<div class="msg msgA" id="${id}"><div class="aiAv">RI</div>
-     <div class="msgB"><div class="typing"><span></span><span></span><span></span></div></div></div>`);
-  msgs.scrollTop=msgs.scrollHeight; return id;
-}
-function removeTyping(id){document.getElementById(id)?.remove();}
-function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-
-// ═══════════════════════════════════════════════════════════════
-//  PHOTOCAL
-// ═══════════════════════════════════════════════════════════════
-function handlePhoto(input){
-  if(!input.files.length) return;
-  const drop=document.getElementById('photoDrop');
-  drop.innerHTML=`<div style="width:40px;height:40px;border:3px solid var(--bd);border-top-color:var(--mint);border-radius:50%;animation:spinAnim .9s linear infinite"></div>
-    <div style="font-size:13px;color:var(--dim);margin-top:8px">Analisando com IA...</div>`;
-  setTimeout(()=>{
-    const foods=[
-      {n:'Frango grelhado com arroz',k:520,p:'44g',c:'58g',f:'9g'},
-      {n:'Omelete de 3 ovos',k:310,p:'22g',c:'4g',f:'22g'},
-      {n:'Bowl de açaí com granola',k:480,p:'8g',c:'78g',f:'14g'},
-      {n:'Pasta integral com atum',k:560,p:'42g',c:'72g',f:'8g'},
-    ];
-    const f=foods[Math.floor(Math.random()*foods.length)];
-    drop.innerHTML=`<div style="font-size:36px">✅</div><div style="font-size:14px;font-weight:700;color:var(--mint)">Prato identificado!</div>`;
-    document.getElementById('pcName').textContent=f.n;
-    document.getElementById('pcK').textContent=f.k;
-    document.getElementById('pcP').textContent=f.p;
-    document.getElementById('pcC').textContent=f.c;
-    document.getElementById('pcF').textContent=f.f;
-    document.getElementById('pcRes').style.display='block';
-    window._photoData=f;
-  },2200);
-}
-
-function addFromPhoto(){
-  if(!window._photoData) return;
-  const f=window._photoData;
-  DB.push('m:'+U.email,{id:Date.now(),name:f.n,kcal:f.k,prot:parseInt(f.p),carbo:parseInt(f.c),gord:parseInt(f.f),tipo:'Lanche',date:hoje()});
-  closeMov('mPhoto'); toast('Adicionado ao diário! ✓'); renderDieta(); renderHome();
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  RECEITA IA
-// ═══════════════════════════════════════════════════════════════
-function setRTag(el,tag){
-  document.querySelectorAll('#recForm .qb').forEach(b=>{b.style.borderColor='';b.style.color='';});
-  el.style.borderColor='var(--mint)'; el.style.color='var(--mint)';
-  document.getElementById('recGoal').value=tag;
-}
-
-async function genRecipe(){
-  const goal=(document.getElementById('recGoal').value||'').trim()||'receita saudável proteica';
-  const restr=(document.getElementById('recRestr').value||'').trim();
-  document.getElementById('recForm').style.display='none';
-  const rr=document.getElementById('recResult');
-  rr.style.display='block';
-  rr.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px"><div class="genSpin"></div><div style="font-size:13px;color:var(--dim)">Gerando receita...</div></div>`;
-  try{
-    const txt=await callAI(`Crie receita: "${goal}".${restr?' Restrições: '+restr:''}\nRetorne SOMENTE JSON sem markdown:\n{"nome":"...","tempo":"20 min","porcoes":2,"calorias":500,"tags":["Alta proteína"],"macros":{"proteina":"40g","carboidrato":"50g","gordura":"12g"},"ingredientes":[{"item":"Frango","qtd":"300g"}],"passos":["Tempere o frango..."]}`);
-    showRecipe(JSON.parse(txt.replace(/```json\n?|\n?```/g,'').trim()));
-  } catch(e){
-    showRecipe({nome:'Bowl Proteico Rimu',tempo:'20 min',porcoes:2,calorias:480,tags:['Alta proteína','Pós-treino'],
-      macros:{proteina:'42g',carboidrato:'38g',gordura:'12g'},
-      ingredientes:[{item:'Frango',qtd:'300g'},{item:'Batata-doce',qtd:'200g'},{item:'Brócolis',qtd:'150g'}],
-      passos:['Cozinhe a batata-doce por 15 min.','Grelhe o frango temperado 7 min de cada lado.','Refogue brócolis no azeite 5 min.','Monte o bowl e sirva quente.']});
+  // Regenerar plano de treino e dieta com novos dados
+  if (U.plan === 'pro') {
+    DB.del('w:'+U.email);
+    DB.del('d:'+U.email);
+    toast('Planos de treino e dieta serão regenerados 🔄');
+    setTimeout(() => { mostrar('pgGen'); gerarPlanos(); }, 1200);
   }
 }
 
-function showRecipe(r){
-  const tags=(r.tags||[]).map(t=>`<span class="tag tm">${t}</span>`).join('');
-  const ings=(r.ingredientes||[]).map(i=>`<div class="ingR"><span>${i.item}</span><span style="color:var(--dim)">${i.qtd}</span></div>`).join('');
-  const steps=(r.passos||[]).map((s,i)=>`<div class="stpR"><div class="stpN">${i+1}</div><div style="font-size:13px;line-height:1.55">${s}</div></div>`).join('');
-  document.getElementById('recResult').innerHTML=`
-    <div class="recC"><div class="recHd">
-      <div style="font-size:17px;font-weight:700">🍽️ ${r.nome}</div>
-      <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--dim)">
-        <span>⏱ ${r.tempo}</span><span>👤 ${r.porcoes}pçs</span><span style="color:var(--coral)">🔥 ${r.calorias}kcal</span></div>
-      <div style="display:flex;gap:6px;margin-top:9px;flex-wrap:wrap">${tags}</div>
-      <div class="macGrid" style="margin-top:10px">
-        <div class="macBox"><div class="mbV" style="color:var(--coral)">${r.calorias}</div><div class="mbL">KCAL</div></div>
-        <div class="macBox"><div class="mbV" style="color:var(--mint)">${r.macros?.proteina||'?'}</div><div class="mbL">PROT</div></div>
-        <div class="macBox"><div class="mbV" style="color:var(--gold)">${r.macros?.carboidrato||'?'}</div><div class="mbL">CARBO</div></div>
-        <div class="macBox"><div class="mbV">${r.macros?.gordura||'?'}</div><div class="mbL">GORDU</div></div>
-      </div></div>
-      <div class="recBd"><div><div class="recSl">Ingredientes</div>${ings}</div>
-        <div><div class="recSl">Modo de preparo</div>${steps}</div></div></div>
-    <button class="bto" style="margin-top:11px" onclick="document.getElementById('recResult').style.display='none';document.getElementById('recForm').style.display='block'">← Criar outra</button>`;
+function refazerQuestionario() {
+  closeMov('mEditPerfil');
+  // Limpar planos gerados para forçar regeneração
+  DB.del('w:'+U.email);
+  DB.del('d:'+U.email);
+  U.onboarded = false;
+  DB.set('u:'+U.email, U);
+  obStep = 1;
+  mostrar('pgOb');
+  renderStep();
+  document.getElementById('ob_nome').value = U.nome || '';
+  toast('Questionário reiniciado!');
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  PAGAMENTO
-// ═══════════════════════════════════════════════════════════════
-function payTab(t){
-  const pix=t==='pix';
-  document.getElementById('payPix').style.display  = pix?'block':'none';
-  document.getElementById('payCard').style.display = pix?'none':'block';
-  const act='border:2px solid var(--lime);background:rgba(245,197,24,.1);color:var(--lime);font-weight:700;';
-  const ina='border:2px solid var(--bd);background:transparent;color:var(--dim);font-weight:600;';
-  const base='flex:1;padding:11px;border-radius:10px;font-size:14px;cursor:pointer;font-family:"DM Sans",sans-serif;transition:all .2s;';
-  document.getElementById('payTabPix').style.cssText =base+(pix?act:ina);
-  document.getElementById('payTabCard').style.cssText=base+(!pix?act:ina);
-}
-
-function copyPix(){
-  navigator.clipboard.writeText('rimu.io@pagamentos.com.br').catch(()=>{});
-  toast('Chave PIX copiada! 📋');
-}
-
-function fmtCard(el){
-  let v=el.value.replace(/[^0-9]/g,'').slice(0,16);
-  el.value=v.replace(/(.{4})/g,'$1 ').trim();
-}
-
-function fmtExp(el){
-  let v=el.value.replace(/[^0-9]/g,'').slice(0,4);
-  if(v.length>=2) v=v.slice(0,2)+'/'+v.slice(2);
-  el.value=v;
-}
-
-function showPayError(msg){
-  let el=document.getElementById('payError');
-  if(!el){el=document.createElement('div');el.id='payError';el.style.cssText='color:var(--coral);font-size:12px;margin-top:6px;text-align:center';
-    document.getElementById('payBtn').insertAdjacentElement('afterend',el);}
-  el.textContent=msg; el.style.display='block';
-}
-
-function processPayment(){
-  const num=(document.getElementById('cardNum').value||'').replace(/\s/g,'');
-  const name=(document.getElementById('cardName').value||'').trim();
-  const exp=(document.getElementById('cardExp').value||'').trim();
-  const cvv=(document.getElementById('cardCvv').value||'').trim();
-  if(num.length<16){showPayError('Número do cartão inválido');return;}
-  if(!name){showPayError('Digite o nome como está no cartão');return;}
-  if(exp.length<5){showPayError('Data de validade inválida');return;}
-  if(cvv.length<3){showPayError('CVV inválido');return;}
-  const btn=document.getElementById('payBtn');
-  btn.textContent='⏳ Processando...'; btn.disabled=true; btn.style.opacity='.7';
-  setTimeout(()=>{
-    btn.textContent='🔒 Pagar R$19,90'; btn.disabled=false; btn.style.opacity='1';
-    closeMov('mPay'); toast('✅ Pagamento confirmado! Bem-vindo ao PRO!');
-  },2400);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  MODAIS / UTILS
-// ═══════════════════════════════════════════════════════════════
-function openMov(id){document.getElementById(id).classList.add('on');}
-function closeMov(id){document.getElementById(id).classList.remove('on');}
-
-function hoje(){return dStr(new Date());}
-function dStr(d){return d.toISOString().split('T')[0];}
-function segunda(){
-  const d=new Date(),day=d.getDay(),diff=d.getDate()-(day===0?6:day-1);
-  return dStr(new Date(d.setDate(diff)));
-}
-function fmtDate(ds){
-  if(!ds) return '—';
-  return new Date(ds+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
-}
-function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function toast(msg){
-  const el=document.getElementById('toastEl');
-  el.textContent=msg; el.classList.add('on');
-  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),2800);
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  PWA
-// ═══════════════════════════════════════════════════════════════
-function makeIcon(size){
-  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" rx="${size*.18}" fill="#08070d"/><text x="50%" y="56%" font-family="Arial Black" font-weight="900" font-size="${size*.42}" fill="#f5c518" text-anchor="middle" dominant-baseline="middle">R</text></svg>`;
-  return 'data:image/svg+xml;base64,'+btoa(svg);
-}
-
-function initPWA(){
-  const icon=makeIcon(192);
-  const al=document.getElementById('appleIcon'); if(al) al.href=icon;
-  const manifest={name:'Rimu.io',short_name:'Rimu',description:'Dieta, Treino e Finanças com IA',
-    start_url:'./',display:'standalone',background_color:'#08070d',theme_color:'#08070d',orientation:'portrait',
-    icons:[{src:icon,sizes:'192x192',type:'image/svg+xml',purpose:'any maskable'},{src:makeIcon(512),sizes:'512x512',type:'image/svg+xml',purpose:'any maskable'}]};
-  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
-  const lnk=document.getElementById('pwaManifest'); if(lnk) lnk.href=URL.createObjectURL(blob);
-  if('serviceWorker' in navigator){
-    const sw=`const C='rimu-v1';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('fetch',e=>e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res;})))))`;
-    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).catch(()=>{});
-  }
-}
+window.addEventListener('load',()=>{ initPWA(); checkiOS(); });
 
 </script>
 </body>
