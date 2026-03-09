@@ -1728,6 +1728,7 @@ async function callAI(prompt, maxTok=2000) {
     method:'POST',
     headers:{
       'Content-Type':'application/json',
+      'x-api-key':'sk-ant-api03-bpxHAH7_U-RfV9R3PWAqR8i37ld2DGz7jNr02MkJTK7yc_J9NuY_GCuYUYBhO_hWJrV7hMmWb9iL-INeHIVFuA-wF_6oAAA',
       'anthropic-version':'2023-06-01',
       'anthropic-dangerous-direct-browser-access':'true'
     },
@@ -2535,14 +2536,6 @@ function salvarEdicaoPerfil() {
   renderHome();
   closeMov('mEditPerfil');
   toast('Perfil atualizado! ✓');
-
-  // Regenerar plano de treino e dieta com novos dados
-  if (U.plan === 'pro') {
-    DB.del('w:'+U.email);
-    DB.del('d:'+U.email);
-    toast('Planos de treino e dieta serão regenerados 🔄');
-    setTimeout(() => { mostrar('pgGen'); gerarPlanos(); }, 1200);
-  }
 }
 
 function refazerQuestionario() {
