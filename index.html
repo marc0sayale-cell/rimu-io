@@ -2523,17 +2523,30 @@ function salvarEdicaoPerfil() {
   const nome = document.getElementById('editNome').value.trim();
   if (!nome) { toast('Digite seu nome'); return; }
 
-  U.nome      = nome;
-  U.peso      = +document.getElementById('editPeso').value;
-  U.metaPeso  = +document.getElementById('editMeta').value;
-  U.objetivo  = document.getElementById('editObjetivo').value;
-  U.nivel     = document.getElementById('editNivel').value;
-  U.local     = document.getElementById('editLocal').value;
-  U.freq      = document.getElementById('editFreq').value;
+  // Atualizar APENAS os campos do perfil, sem tocar em nada mais
+  const saved = DB.get('u:'+U.email) || {};
+  const updated = Object.assign({}, saved, {
+    nome,
+    peso:     +document.getElementById('editPeso').value,
+    metaPeso: +document.getElementById('editMeta').value,
+    objetivo: document.getElementById('editObjetivo').value,
+    nivel:    document.getElementById('editNivel').value,
+    local:    document.getElementById('editLocal').value,
+    freq:     document.getElementById('editFreq').value,
+  });
 
+  // Garantir que campos críticos não sejam perdidos
+  updated.onboarded = saved.onboarded ?? U.onboarded;
+  updated.plan      = saved.plan      ?? U.plan;
+  updated.email     = U.email;
+
+  // Atualizar U e salvar
+  Object.assign(U, updated);
   DB.set('u:'+U.email, U);
   atualizarPerfil();
   renderHome();
+  renderTreino();
+  renderDieta();
   closeMov('mEditPerfil');
   toast('Perfil atualizado! ✓');
 }
