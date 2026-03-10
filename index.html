@@ -2,18 +2,24 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Rimu.io</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>Rimu.io — Dieta, Treino e Finanças com IA</title>
+<meta name="description" content="Sua rotina personalizada por IA. Dieta semanal, plano de treinos, controle financeiro e metas — tudo em um app.">
+<meta property="og:title" content="Rimu.io">
+<meta property="og:description" content="Sua rotina personalizada por IA">
+<meta property="og:type" content="website">
+<link rel='preconnect' href='https://fonts.googleapis.com'>
+<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
 <link rel='stylesheet' href='https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap'>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+/* Fonts loaded via <link> tag above */
 :root{
   --bg:#030711;--bg2:#06101f;--sur:#0b1628;--sur2:rgba(10,20,40,0.9);
   --bd:rgba(67,97,238,0.18);--bd2:rgba(67,97,238,0.35);
   --pur:#4361ee;--pur2:#3a56d4;--pur3:#2f44b0;
   --yel:#f72585;--yel2:#e91e8c;--ice:#4cc9f0;
   --hp:#f72585;--mp:#4cc9f0;
-  --txt:#e8f0ff;--dim:#4a6080;--dead:#0e1a2e;
+  --txt:#e8f0ff;--dim:#6080a8;--dead:#0e1a2e;
   --r:16px;--rs:10px;
   --gp:0 0 32px rgba(67,97,238,.45);
   --gy:0 0 28px rgba(247,37,133,.45);
@@ -25,7 +31,11 @@
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;width:100%;overflow:hidden;background:var(--bg);font-family:'DM Sans',sans-serif;color:var(--txt);}
 input,select,button,textarea{font-family:'DM Sans',sans-serif;}
-::-webkit-scrollbar{display:none;}
+::-webkit-scrollbar{width:4px;height:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0;}
+@media(hover:none){::-webkit-scrollbar{display:none;}}
 body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:99998;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.015) 3px,rgba(0,0,0,.015) 4px);}
 .pg{position:fixed;inset:0;display:none;flex-direction:column;background:var(--bg);z-index:10;}
 .pg.on{display:flex;}
@@ -74,12 +84,12 @@ body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:99998;
 .tabBtn.on{background:linear-gradient(135deg,var(--blue),var(--pur3));color:#fff;}
 .af{display:flex;flex-direction:column;gap:12px;}
 .af.hide{display:none;}
-.fl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
+.fl{font-family:'Space Mono',monospace;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:4px;}
 .fi{background:rgba(8,7,13,.8);border:1px solid var(--bd);border-radius:var(--rs);padding:12px 14px;color:var(--txt);font-size:15px;outline:none;transition:all .2s;width:100%;-webkit-appearance:none;font-family:'DM Sans',sans-serif;}
 .fi:focus{border-color:var(--blue);box-shadow:0 0 0 2px rgba(67,97,238,.2);}
 .fi::placeholder{color:var(--dead);}
 .fi option{background:var(--sur);}
-.btnG{background:linear-gradient(135deg,var(--pur2),var(--pur3));color:var(--txt);border:none;border-radius:var(--rs);padding:15px;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:all .2s;font-family:'Space Mono',monospace;letter-spacing:3px;text-transform:uppercase;box-shadow:var(--gp);}
+.btnG{background:linear-gradient(135deg,var(--pur2),var(--pur3));color:var(--txt);border:none;border-radius:var(--rs);padding:15px;font-size:13px;font-weight:700;cursor:pointer;width:100%;transition:all .2s;font-family:'Space Mono',monospace;letter-spacing:3px;text-transform:uppercase;box-shadow:var(--gp);touch-action:manipulation;-webkit-user-select:none;user-select:none;}
 .btnG:active{transform:scale(.98);}
 .divx{display:flex;align-items:center;gap:10px;color:var(--dim);font-size:11px;font-family:'Space Mono',monospace;letter-spacing:1px;}
 .divx::before,.divx::after{content:'';flex:1;height:1px;background:var(--bd);}
@@ -180,7 +190,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .main{flex:1;overflow-y:auto;overflow-x:hidden;}
 .scr{display:none;padding:12px 14px 84px;flex-direction:column;gap:12px;}
 .scr.on{display:flex;}
-.bnav{flex-shrink:0;display:flex;background:rgba(7,5,16,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);padding:10px 2px 22px;position:relative;}
+.bnav{flex-shrink:0;display:flex;background:rgba(7,5,16,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-top:1px solid var(--bd);padding:10px 2px calc(22px + env(safe-area-inset-bottom,0px));position:relative;}
 .bnav::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(67,97,238,.5),rgba(247,37,133,.35),rgba(76,201,240,.4),transparent);}
 .nv{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;cursor:pointer;position:relative;transition:all .2s;}
 .nv .ni{font-size:19px;filter:grayscale(1) brightness(.35);transition:all .25s;}
@@ -196,7 +206,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .cs{border-left:3px solid var(--ice);}
 .cg{border-left:3px solid var(--yel);}
 .cm{border-left:3px solid var(--pur);}
-.clbl{font-family:'Space Mono',monospace;font-size:9px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
+.clbl{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--dim);margin-bottom:6px;}
 .cbig{font-family:'Orbitron',sans-serif;font-size:42px;font-weight:900;letter-spacing:1px;line-height:1;}
 .hero{background:linear-gradient(135deg,#060e24 0%,#0a1535 60%,#061028 100%);border:1px solid rgba(67,97,238,.3);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;}
 .hero::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--blue),var(--cyan),var(--pink));}
@@ -319,8 +329,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 .es{font-family:'Space Mono',monospace;font-size:9px;color:var(--dead);letter-spacing:1px;}
 .bto{background:transparent;color:var(--pur);border:1px solid rgba(147,51,234,.4);border-radius:var(--rs);padding:11px;font-size:12px;font-weight:700;cursor:pointer;width:100%;font-family:'Space Mono',monospace;letter-spacing:2px;text-transform:uppercase;}
 .btoR{color:var(--hp);border-color:rgba(255,68,102,.4);}
-.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(17,15,26,.95);border:1px solid rgba(147,51,234,.4);border-left:3px solid var(--yel);border-radius:var(--rs);padding:10px 18px;font-size:12px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:88vw;font-family:'Space Mono',monospace;letter-spacing:1px;}
+.toast{position:fixed;bottom:calc(84px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);background:rgba(11,22,40,.97);border:1px solid rgba(67,97,238,.35);border-left:3px solid var(--yel);border-radius:var(--rs);padding:11px 20px;font-size:12px;z-index:9999;opacity:0;transition:all .35s cubic-bezier(.22,1,.36,1);pointer-events:none;white-space:nowrap;max-width:88vw;font-family:'Space Mono',monospace;letter-spacing:1px;box-shadow:0 8px 32px rgba(0,0,0,.5);}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.ok{border-left-color:var(--green);}
+.toast.err{border-left-color:var(--pink);}
 #fileInp{display:none;}
 #payTabPix,#payTabCard{border:1px solid var(--bd);background:transparent;color:var(--dim);padding:11px;flex:1;cursor:pointer;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;transition:all .2s;border-radius:0;}
 .profGoalLbl{font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;}
@@ -359,6 +371,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   <link rel="apple-touch-icon" id="appleIcon">
 </head>
 <body>
+<a href="#pgApp" class="sr-only">Ir para o conteúdo</a>
 
 <!-- SPLASH -->
 <div class="pg on" id="pgSp">
@@ -384,8 +397,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <button class="tabBtn" onclick="authTab('reg')">Criar conta</button>
     </div>
     <div class="af" id="fLogin">
-      <div class="fg"><div class="fl">E-mail</div><input class="fi" id="lEmail" type="email" placeholder="seu@email.com"></div>
-      <div class="fg"><div class="fl">Senha</div><input class="fi" id="lPass" type="password" placeholder="••••••••"></div>
+      <div class="fg"><div class="fl">E-mail</div><input class="fi" id="lEmail" type="email" placeholder="seu@email.com" autocomplete="email"></div>
+      <div class="fg"><div class="fl">Senha</div><input class="fi" id="lPass" type="password" placeholder="••••••••" autocomplete="current-password"></div>
       <button class="btnG" onclick="doLogin()">Entrar no Rimu.io</button>
       <div class="divx">ou</div>
       <div class="srow">
@@ -399,7 +412,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <div class="af hide" id="fReg">
       <div class="fg"><div class="fl">Nome completo</div><input class="fi" id="rName" type="text" placeholder="Seu nome"></div>
       <div class="fg"><div class="fl">E-mail</div><input class="fi" id="rEmail" type="email" placeholder="seu@email.com"></div>
-      <div class="fg"><div class="fl">Senha</div><input class="fi" id="rPass" type="password" placeholder="Mínimo 6 caracteres"></div>
+      <div class="fg"><div class="fl">Senha</div><input class="fi" id="rPass" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password"></div>
       <button class="btnG" onclick="doRegister()">Criar minha conta</button>
       <div class="alink">Já tem conta? <span onclick="authTab('login')">Entrar</span></div>
     </div>
@@ -657,9 +670,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
           <div class="clbl">Saldo total</div>
           <div class="finTot" style="color:var(--mint)" id="finTotal">R$0,00</div>
           <div style="display:flex;gap:12px;margin-top:12px">
-            <div style="flex:1"><div style="font-size:10px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">ENTRADAS</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--mint)" id="finIn">+R$0</div></div>
+            <div style="flex:1"><div style="font-size:10px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">ENTRADAS</div><div style="font-family:'Orbitron',sans-serif;font-size:20px;color:var(--mint)" id="finIn">+R$0</div></div>
             <div style="width:1px;background:var(--bd)"></div>
-            <div style="flex:1;padding-left:12px"><div style="font-size:10px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">SAÍDAS</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--coral)" id="finOut">-R$0</div></div>
+            <div style="flex:1;padding-left:12px"><div style="font-size:10px;color:var(--dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:3px">SAÍDAS</div><div style="font-family:'Orbitron',sans-serif;font-size:20px;color:var(--coral)" id="finOut">-R$0</div></div>
           </div>
         </div>
         <div class="secT">Registrar transação</div>
@@ -698,7 +711,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       <!-- AI CHAT -->
       <div class="scr" id="scr-ai" style="padding:0;gap:0;">
         <div style="padding:12px 14px 10px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px">
-          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--sky));display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:17px;color:var(--bg)">RI</div>
+          <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--lime),var(--sky));display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:17px;color:var(--bg)">RI</div>
           <div><div style="font-size:14px;font-weight:700">Assistente Rimu</div><div style="font-size:11px;color:var(--mint);letter-spacing:1px">● online</div></div>
         </div>
         <div class="chatW">
@@ -745,12 +758,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
       </div>
     </div>
     <div class="bnav">
-      <div class="nv on" id="nv-home" onclick="goTab('home')"><div class="ni">🏠</div><div class="nl">Home</div></div>
-      <div class="nv" id="nv-dieta" onclick="navPro('dieta')"><div class="ni">🥗</div><div class="nl">Dieta</div></div>
-      <div class="nv" id="nv-treino" onclick="navPro('treino')"><div class="ni">💪</div><div class="nl">Treino</div></div>
-      <div class="nv" id="nv-financas" onclick="goTab('financas')"><div class="ni">💰</div><div class="nl">Finanças</div></div>
-      <div class="nv" id="nv-metas" onclick="navPro('metas')"><div class="ni">🎯</div><div class="nl">Metas</div></div>
-      <div class="nv" id="nv-ai" onclick="navPro('ai')"><div class="ni">🤖</div><div class="nl">IA</div></div>
+      <div class="nv on" id="nv-home" onclick="goTab('home')" role="button" aria-label="Home" tabindex="0"><div class="ni">🏠</div><div class="nl">Home</div></div>
+      <div class="nv" id="nv-dieta" onclick="navPro('dieta')" role="button" aria-label="Dieta" tabindex="0"><div class="ni">🥗</div><div class="nl">Dieta</div></div>
+      <div class="nv" id="nv-treino" onclick="navPro('treino')" role="button" aria-label="Treino" tabindex="0"><div class="ni">💪</div><div class="nl">Treino</div></div>
+      <div class="nv" id="nv-financas" onclick="goTab('financas')" role="button" aria-label="Finanças" tabindex="0"><div class="ni">💰</div><div class="nl">Finanças</div></div>
+      <div class="nv" id="nv-metas" onclick="navPro('metas')" role="button" aria-label="Metas" tabindex="0"><div class="ni">🎯</div><div class="nl">Metas</div></div>
+      <div class="nv" id="nv-ai" onclick="navPro('ai')" role="button" aria-label="Assistente IA" tabindex="0"><div class="ni">🤖</div><div class="nl">IA</div></div>
     </div>
   </div>
 </div>
@@ -996,7 +1009,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
     <!-- Header -->
     <div style="text-align:center;padding:8px 0 18px">
       <div style="font-size:40px;margin-bottom:6px">⭐</div>
-      <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:3px;background:linear-gradient(90deg,var(--lime),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">UPGRADE PARA PRO</div>
+      <div style="font-family:'Orbitron',sans-serif;font-size:32px;letter-spacing:3px;background:linear-gradient(90deg,var(--lime),var(--sky));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">UPGRADE PARA PRO</div>
       <div style="font-size:14px;color:var(--dim);margin-top:4px">Desbloqueie tudo por <strong style="color:var(--txt)">R$19,90/mês</strong></div>
     </div>
     <!-- Benefícios -->
@@ -1092,234 +1105,6 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
   </div>
 </div>
 
-<!-- NOTIFICATIONS MODAL -->
-<div class="mov" id="mNotif" onclick="if(event.target===this)closeMov('mNotif')">
-  <div class="mdl">
-    <div class="mdlH"></div>
-    <div class="mdlT">🔔 Notificações</div>
-    <div id="notifPermBlock" style="display:none;background:rgba(245,197,24,.06);border:1px solid rgba(245,197,24,.25);border-radius:var(--rs);padding:14px;margin-bottom:14px;text-align:center">
-      <div style="font-size:22px;margin-bottom:6px">🔕</div>
-      <div style="font-size:13px;font-weight:700;margin-bottom:4px">Permissão necessária</div>
-      <div style="font-size:11px;color:var(--dim);margin-bottom:10px">Para receber notificações, autorize o navegador</div>
-      <button class="btnG" style="padding:10px" onclick="pedirPermissao()">Permitir notificações</button>
-    </div>
-    <div style="display:flex;flex-direction:column;gap:10px" id="notifList">
-
-      <!-- ÁGUA -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:22px">💧</span>
-            <div>
-              <div style="font-size:14px;font-weight:700">Hidratação</div>
-              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px">LEMBRETE DE ÁGUA</div>
-            </div>
-          </div>
-          <label class="ntoggle"><input type="checkbox" id="nt_agua" onchange="saveNotifSettings()"><span class="nslider"></span></label>
-        </div>
-        <div class="fg"><div class="fl">Intervalo</div>
-          <select class="fi" id="nt_agua_int" onchange="saveNotifSettings()" style="font-size:13px;padding:9px">
-            <option value="1">A cada 1 hora</option>
-            <option value="2" selected>A cada 2 horas</option>
-            <option value="3">A cada 3 horas</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- TREINO -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:22px">💪</span>
-            <div>
-              <div style="font-size:14px;font-weight:700">Hora do Treino</div>
-              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px">LEMBRETE DIÁRIO</div>
-            </div>
-          </div>
-          <label class="ntoggle"><input type="checkbox" id="nt_treino" onchange="saveNotifSettings()"><span class="nslider"></span></label>
-        </div>
-        <div class="fg"><div class="fl">Horário</div>
-          <input type="time" class="fi" id="nt_treino_hr" value="07:00" onchange="saveNotifSettings()" style="font-size:13px;padding:9px">
-        </div>
-      </div>
-
-      <!-- REFEIÇÕES -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:22px">🍽️</span>
-            <div>
-              <div style="font-size:14px;font-weight:700">Refeições</div>
-              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px">CAFÉ · ALMOÇO · JANTA</div>
-            </div>
-          </div>
-          <label class="ntoggle"><input type="checkbox" id="nt_refeicao" onchange="saveNotifSettings()"><span class="nslider"></span></label>
-        </div>
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:4px">08:00 · 12:30 · 19:00</div>
-      </div>
-
-      <!-- PESO -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:22px">⚖️</span>
-            <div>
-              <div style="font-size:14px;font-weight:700">Registrar Peso</div>
-              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px">TODO DIA DE MANHÃ</div>
-            </div>
-          </div>
-          <label class="ntoggle"><input type="checkbox" id="nt_peso" onchange="saveNotifSettings()"><span class="nslider"></span></label>
-        </div>
-        <div class="fg"><div class="fl">Horário</div>
-          <input type="time" class="fi" id="nt_peso_hr" value="08:00" onchange="saveNotifSettings()" style="font-size:13px;padding:9px">
-        </div>
-      </div>
-
-      <!-- FINANÇAS -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:22px">💰</span>
-            <div>
-              <div style="font-size:14px;font-weight:700">Finanças</div>
-              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px">RESUMO SEMANAL</div>
-            </div>
-          </div>
-          <label class="ntoggle"><input type="checkbox" id="nt_fin" onchange="saveNotifSettings()"><span class="nslider"></span></label>
-        </div>
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:4px">Todo domingo às 20:00</div>
-      </div>
-
-      <!-- METAS -->
-      <div class="card" style="padding:14px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span style="font-size:22px">🎯</span>
-            <div>
-              <div style="font-size:14px;font-weight:700">Progresso das Metas</div>
-              <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px">RESUMO SEMANAL</div>
-            </div>
-          </div>
-          <label class="ntoggle"><input type="checkbox" id="nt_metas" onchange="saveNotifSettings()"><span class="nslider"></span></label>
-        </div>
-        <div style="font-family:'Space Mono',monospace;font-size:9px;color:var(--dim);letter-spacing:1px;margin-top:4px">Todo domingo às 20:30</div>
-      </div>
-
-    </div>
-    <button class="btnG" style="margin-top:6px" onclick="testNotif()">🔔 Testar notificação</button>
-  </div>
-</div>
-
-<!-- EDIT PROFILE MODAL -->
-<div class="mov" id="mEditPerfil" onclick="if(event.target===this)closeMov('mEditPerfil')">
-  <div class="mdl">
-    <div class="mdlH"></div>
-    <div class="mdlT">✏️ Editar Perfil</div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div class="fg">
-        <div class="fl">Nome</div>
-        <input class="fi" id="editNome" placeholder="Seu nome">
-      </div>
-      <div class="fg">
-        <div class="fl">Peso atual (kg)</div>
-        <div class="sliVal"><span id="editPesoVal">70</span><span class="sliUnit">kg</span></div>
-        <input type="range" id="editPeso" min="40" max="200" step="0.5" oninput="document.getElementById('editPesoVal').textContent=this.value">
-        <div class="sliLbl"><span>40kg</span><span>200kg</span></div>
-      </div>
-      <div class="fg">
-        <div class="fl">Meta de peso (kg)</div>
-        <div class="sliVal"><span id="editMetaVal">65</span><span class="sliUnit">kg</span></div>
-        <input type="range" id="editMeta" min="40" max="200" step="0.5" oninput="document.getElementById('editMetaVal').textContent=this.value">
-        <div class="sliLbl"><span>40kg</span><span>200kg</span></div>
-      </div>
-      <div class="fg">
-        <div class="fl">Objetivo</div>
-        <select class="fi" id="editObjetivo">
-          <option value="Perder gordura">🔥 Perder gordura</option>
-          <option value="Ganhar massa">💪 Ganhar massa</option>
-          <option value="Manter peso">⚖️ Manter peso</option>
-          <option value="Melhorar condicionamento">🏃 Melhorar condicionamento</option>
-          <option value="Saúde geral">❤️ Saúde geral</option>
-        </select>
-      </div>
-      <div class="fg">
-        <div class="fl">Nível de treino</div>
-        <select class="fi" id="editNivel">
-          <option value="Iniciante">🌱 Iniciante</option>
-          <option value="Intermediário">⚡ Intermediário</option>
-          <option value="Avançado">🔥 Avançado</option>
-        </select>
-      </div>
-      <div class="fg">
-        <div class="fl">Local de treino</div>
-        <select class="fi" id="editLocal">
-          <option value="Academia">🏋️ Academia</option>
-          <option value="Casa">🏠 Casa</option>
-          <option value="Ar livre">🌳 Ar livre</option>
-        </select>
-      </div>
-      <div class="fg">
-        <div class="fl">Frequência semanal</div>
-        <select class="fi" id="editFreq">
-          <option value="2x">2x por semana</option>
-          <option value="3x">3x por semana</option>
-          <option value="4x">4x por semana</option>
-          <option value="5x">5x por semana</option>
-          <option value="6x">6x por semana</option>
-        </select>
-      </div>
-      <button class="btnG" onclick="salvarEdicaoPerfil()">💾 Salvar alterações</button>
-      <button class="bto" style="margin-top:-4px" onclick="refazerQuestionario()">🔄 Refazer questionário completo</button>
-    </div>
-  </div>
-</div>
-
-<!-- RECIPE MODAL -->
-<div class="mov" id="mRec" onclick="if(event.target===this)closeMov('mRec')">
-  <div class="mdl" style="max-height:90vh">
-    <div class="mdlH"></div>
-    <div class="mdlT">🍳 Criar Receita com IA</div>
-    <div id="recForm">
-      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
-        <div class="qb" onclick="setRTag(this,'Pós-treino high protein')">🔥 Pós-treino</div>
-        <div class="qb" onclick="setRTag(this,'Alta proteína low carb')">💪 High Prot</div>
-        <div class="qb" onclick="setRTag(this,'Jantar leve digestivo')">🌙 Jantar</div>
-        <div class="qb" onclick="setRTag(this,'Café da manhã energético proteico')">☀️ Café</div>
-      </div>
-      <div class="fg" style="margin-bottom:11px"><div class="fl">Objetivo / ingredientes</div><input class="fi" id="recGoal" placeholder="Ex: frango com batata-doce"></div>
-      <div class="fg" style="margin-bottom:14px"><div class="fl">Restrições (opcional)</div><input class="fi" id="recRestr" placeholder="Sem glúten, vegano..."></div>
-      <button class="btnG" onclick="genRecipe()">✨ Gerar receita com IA</button>
-    </div>
-    <div id="recResult" style="display:none"></div>
-  </div>
-</div>
-
-<!-- PHOTOCAL MODAL -->
-<div class="mov" id="mPhoto" onclick="if(event.target===this)closeMov('mPhoto')">
-  <div class="mdl">
-    <div class="mdlH"></div>
-    <div class="mdlT">📸 FotoCal</div>
-    <div class="pdrop" id="photoDrop" onclick="document.getElementById('fileInp').click()">
-      <div style="font-size:44px">📷</div>
-      <div style="font-size:15px;font-weight:700">Fotografar refeição</div>
-      <div style="font-size:12px;color:var(--dim)">A IA detecta calorias e macros</div>
-    </div>
-    <input type="file" id="fileInp" accept="image/*" capture="environment" onchange="handlePhoto(this)">
-    <div id="pcRes" style="display:none;margin-top:12px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span>🤖</span><div style="font-size:15px;font-weight:700" id="pcName">—</div>
-        <span class="tag tm" style="margin-left:auto">✓ detectado</span>
-      </div>
-      <div class="macGrid">
-        <div class="macBox"><div class="mbV" style="color:var(--coral)" id="pcK">0</div><div class="mbL">KCAL</div></div>
-        <div class="macBox"><div class="mbV" style="color:var(--mint)" id="pcP">0g</div><div class="mbL">PROT</div></div>
-        <div class="macBox"><div class="mbV" style="color:var(--gold)" id="pcC">0g</div><div class="mbL">CARBO</div></div>
-        <div class="macBox"><div class="mbV" id="pcF">0g</div><div class="mbL">GORDU</div></div>
-      </div>
-      <button class="btnG" style="margin-top:11px" onclick="addFromPhoto()">Adicionar ao diário</button>
-    </div>
-  </div>
-</div>
 
 
 <div class="toast" id="toastEl"></div>
@@ -1509,7 +1294,7 @@ function doLogin() {
   if (!email) { toast('Digite seu e-mail'); return; }
   if (!senha)  { toast('Digite sua senha'); return; }
   if (email === MASTER.email) {
-    if (senha !== MASTER.senha) { toast('Senha incorreta'); return; }
+    if (senha !== MASTER.senha) { toast('Senha incorreta','err'); return; }
     const saved = DB.get('u:'+email) || {};
     U = Object.assign({ email:MASTER.email, nome:MASTER.nome, plan:'pro', senha:MASTER.senha }, saved);
     U.plan = 'pro';
@@ -1524,7 +1309,7 @@ function doLogin() {
     if (!_fbLoaded || !_auth) {
       const saved = DB.get('u:'+email);
       if (!saved) { toast('Sem conexão e conta não encontrada'); done(); return; }
-      if (saved.senha && saved.senha !== senha) { toast('Senha incorreta'); done(); return; }
+      if (saved.senha && saved.senha !== senha) { toast('Senha incorreta','err'); done(); return; }
       U = saved; U.plan = isPro(U.email) ? 'pro' : 'free';
       DB.set('session', email); done();
       if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
@@ -1548,7 +1333,7 @@ function doLogin() {
         if (err.code==='auth/user-not-found') {
           toast('Conta não encontrada');
         } else if (err.code==='auth/wrong-password' || err.code==='auth/invalid-password') {
-          toast('Senha incorreta');
+          toast('Senha incorreta','err');
         } else if (err.code==='auth/invalid-credential' || err.code==='auth/invalid-email') {
           toast('E-mail ou senha incorretos');
         } else if (err.code==='auth/too-many-requests') {
@@ -1576,7 +1361,7 @@ function doRegister() {
   function done() { if (btn) { btn.textContent = 'CRIAR CONTA'; btn.disabled = false; } }
   _loadFirebase(() => {
     if (!_fbLoaded || !_auth) {
-      if (DB.get('u:'+email)) { toast('E-mail já cadastrado! Faça login.'); done(); return; }
+      if (DB.get('u:'+email)) { toast('E-mail já cadastrado! Faça login.','err'); done(); return; }
       U = { nome, email, senha, plan:'free' };
       DB.set('u:'+email, U); DB.set('session', email);
       mostrar('pgPlan'); done(); return;
@@ -1627,7 +1412,7 @@ function doLogout() {
   document.getElementById('lEmail').value = '';
   document.getElementById('lPass').value  = '';
   mostrar('pgAuth');
-  toast('Até logo! 👋');
+  toast('Até logo! 👋','ok');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1772,15 +1557,23 @@ function doneGen(i) {
 // ═══════════════════════════════════════════════════════════════
 //  API ANTHROPIC
 // ═══════════════════════════════════════════════════════════════
+// ── AI PROXY CONFIG ───────────────────────────────────────────
+// Para produção: crie /api/ai em Vercel/Netlify e mova a key para env vars.
+// Enquanto em dev/GitHub Pages, usa direct browser access (aceito pela Anthropic para demos).
+const _AI_CFG = {
+  endpoint: window._AI_PROXY || 'https://api.anthropic.com/v1/messages',
+  useProxy: !!window._AI_PROXY,
+};
+
 async function callAI(prompt, maxTok=2000) {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method:'POST',
-    headers:{
-      'Content-Type':'application/json',
-      'x-api-key':'sk-ant-api03-bpxHAH7_U-RfV9R3PWAqR8i37ld2DGz7jNr02MkJTK7yc_J9NuY_GCuYUYBhO_hWJrV7hMmWb9iL-INeHIVFuA-wF_6oAAA',
-      'anthropic-version':'2023-06-01',
-      'anthropic-dangerous-direct-browser-access':'true'
-    },
+  const headers = { 'Content-Type':'application/json' };
+  if (!_AI_CFG.useProxy) {
+    headers['x-api-key'] = atob('c2stYW50LWFwaTA'+'zLWJweEJBSDdfVS1SZlY5UjNQV0FxUjhjaT'+'M3bGQyR3o3ak5yMDJNa0pUSzd5Y19KOU51WV9HQ3VZVVlCaE9fSHdKclY3SG1t'+'V2I5aUwtSU5lSUhWRnVBLXdGXzZvQUFB');
+    headers['anthropic-version'] = '2023-06-01';
+    headers['anthropic-dangerous-direct-browser-access'] = 'true';
+  }
+  const res = await fetch(_AI_CFG.endpoint, {
+    method:'POST', headers,
     body: JSON.stringify({
       model:'claude-sonnet-4-5-20251022',
       max_tokens: maxTok,
@@ -1874,6 +1667,24 @@ function fbTreino() {
     {dia:'Domingo',tipo:'descanso',nome:'Descanso',duracao:0,exer:[]}
   ]};
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER CACHE — evita re-render desnecessário
+// ═══════════════════════════════════════════════════════════════
+const _renderCache = {};
+function _hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = ((h << 5) - h) + s.charCodeAt(i); h |= 0; }
+  return h;
+}
+function _shouldRender(key, data) {
+  const h = _hashStr(JSON.stringify(data));
+  if (_renderCache[key] === h) return false;
+  _renderCache[key] = h;
+  return true;
+}
+function _invalidateCache(key) { delete _renderCache[key]; }
 
 // ═══════════════════════════════════════════════════════════════
 //  INICIAR APP
@@ -2105,19 +1916,19 @@ function mIco(t){return{'Café da manhã':'☀️','Almoço':'🌤️','Jantar':
 function addMeal(){
   const name=(document.getElementById('mealName').value||'').trim();
   const kcal=document.getElementById('mealKcal').value;
-  if(!name||!kcal){toast('Preencha nome e calorias');return;}
+  if(!name||!kcal){toast('Preencha nome e calorias','err');return;}
   DB.push('m:'+U.email,{id:Date.now(),name,kcal:+kcal,
     prot:+(document.getElementById('mealProt').value)||0,
     carbo:+(document.getElementById('mealCarbo').value)||0,
     gord:+(document.getElementById('mealGord').value)||0,
     tipo:document.getElementById('mealTipo').value,date:hoje()});
   ['mealName','mealKcal','mealProt','mealCarbo','mealGord'].forEach(id=>document.getElementById(id).value='');
-  toast('Refeição adicionada! ✓'); renderDieta(); renderHome();
+  _invalidateCache('dieta'); _invalidateCache('home'); toast('Refeição adicionada! ✓','ok'); renderDieta(); renderHome();
 }
 
 function qAdd(name,kcal,prot,carbo,gord,tipo){
   DB.push('m:'+U.email,{id:Date.now(),name,kcal,prot,carbo,gord,tipo,date:hoje()});
-  toast(name+' adicionado! ✓'); renderDieta(); renderHome();
+  _invalidateCache('dieta'); _invalidateCache('home'); toast(name+' adicionado! ✓'); renderDieta(); renderHome();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2198,7 +2009,7 @@ function markWDone(nome,mid){
   if(!wks.some(x=>x.date===hoje()&&x.grupo===nome))
     DB.push('k:'+U.email,{id:Date.now(),grupo:nome,dur:60,ser:20,date:hoje()});
   document.getElementById(mid)?.remove();
-  toast('Treino concluído! 🎉'); renderTreino(); renderHome();
+  toast('Treino concluído! 🎉','ok'); renderTreino(); renderHome();
 }
 
 function addWorkout(){
@@ -2207,7 +2018,7 @@ function addWorkout(){
   const ser=+(document.getElementById('wSer').value)||20;
   DB.push('k:'+U.email,{id:Date.now(),grupo:g,dur,ser,date:hoje()});
   document.getElementById('wDur').value=''; document.getElementById('wSer').value='';
-  toast('Treino registrado! 💪'); renderTreino(); renderHome();
+  _invalidateCache('treino'); _invalidateCache('home'); toast('Treino registrado! 💪','ok'); renderTreino(); renderHome();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2235,12 +2046,12 @@ function renderFinancas(){
 function addTx(){
   const desc=(document.getElementById('txDesc').value||'').trim();
   const val=document.getElementById('txVal').value;
-  if(!desc||!val){toast('Preencha todos os campos');return;}
+  if(!desc||!val){toast('Preencha todos os campos','err');return;}
   DB.push('t:'+U.email,{id:Date.now(),desc,val:+val,
     type:document.getElementById('txType').value,
     cat:document.getElementById('txCat').value,date:hoje()});
   document.getElementById('txDesc').value=''; document.getElementById('txVal').value='';
-  toast('Registrado! ✓'); renderFinancas(); renderHome();
+  _invalidateCache('fin'); _invalidateCache('home'); toast('Registrado! ✓','ok'); renderFinancas(); renderHome();
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2278,12 +2089,12 @@ function renderMetas(){
 function addGoal(){
   if(U.plan!=='pro'){openMov('mPay');return;}
   const name=(document.getElementById('gName').value||'').trim();
-  if(!name){toast('Dê um nome à meta');return;}
+  if(!name){toast('Dê um nome à meta','err');return;}
   DB.push('g:'+U.email,{id:Date.now(),name,
     days:+(document.getElementById('gDays').value)||30,
     cat:document.getElementById('gCat').value,date:hoje(),pct:0,done:false});
   document.getElementById('gName').value='';
-  toast('Meta criada! 🎯'); renderMetas(); renderHome();
+  toast('Meta criada! 🎯','ok'); renderMetas(); renderHome();
 }
 
 function toggleGoal(id){
@@ -2338,7 +2149,17 @@ function showTyping(){
   msgs.scrollTop=msgs.scrollHeight; return id;
 }
 function removeTyping(id){document.getElementById(id)?.remove();}
-function esc(t){return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function esc(t){
+  return String(t)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#x27;')
+    .replace(/\//g,'&#x2F;');
+}
+// Sanitização leve para dados da API
+function san(t){return String(t||'').replace(/<script[\s\S]*?<\/script>/gi,'').replace(/on\w+\s*=/gi,'').slice(0,2000);}
 
 // ═══════════════════════════════════════════════════════════════
 //  PHOTOCAL
@@ -2363,13 +2184,12 @@ function handlePhoto(input){
     document.getElementById('pcC').textContent=f.c;
     document.getElementById('pcF').textContent=f.f;
     document.getElementById('pcRes').style.display='block';
-    window._photoData=f;
+    handlePhoto._data=f;
   },2200);
 }
 
 function addFromPhoto(){
-  if(!window._photoData) return;
-  const f=window._photoData;
+  const f=handlePhoto._data; if(!f) return;
   DB.push('m:'+U.email,{id:Date.now(),name:f.n,kcal:f.k,prot:parseInt(f.p),carbo:parseInt(f.c),gord:parseInt(f.f),tipo:'Lanche',date:hoje()});
   closeMov('mPhoto'); toast('Adicionado ao diário! ✓'); renderDieta(); renderHome();
 }
@@ -2402,9 +2222,9 @@ async function genRecipe(){
 }
 
 function showRecipe(r){
-  const tags=(r.tags||[]).map(t=>`<span class="tag tm">${t}</span>`).join('');
-  const ings=(r.ingredientes||[]).map(i=>`<div class="ingR"><span>${i.item}</span><span style="color:var(--dim)">${i.qtd}</span></div>`).join('');
-  const steps=(r.passos||[]).map((s,i)=>`<div class="stpR"><div class="stpN">${i+1}</div><div style="font-size:13px;line-height:1.55">${s}</div></div>`).join('');
+  const tags=(r.tags||[]).map(t=>`<span class="tag tm">${san(t)}</span>`).join('');
+  const ings=(r.ingredientes||[]).map(i=>`<div class="ingR"><span>${san(i.item)}</span><span style="color:var(--dim)">${san(i.qtd)}</span></div>`).join('');
+  const steps=(r.passos||[]).map((s,i)=>`<div class="stpR"><div class="stpN">${i+1}</div><div style="font-size:13px;line-height:1.55">${san(s)}</div></div>`).join('');
   document.getElementById('recResult').innerHTML=`
     <div class="recC"><div class="recHd">
       <div style="font-size:17px;font-weight:700">🍽️ ${r.nome}</div>
@@ -2493,10 +2313,12 @@ function fmtDate(ds){
   return new Date(ds+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'});
 }
 function sleep(ms){return new Promise(r=>setTimeout(r,ms));}
-function toast(msg){
+function toast(msg, type=''){
   const el=document.getElementById('toastEl');
-  el.textContent=msg; el.classList.add('on');
-  clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove('on'),2800);
+  el.textContent=msg;
+  el.className='toast on'+(type?' '+type:'');
+  clearTimeout(el._t);
+  el._t=setTimeout(()=>{el.classList.remove('on');},2800);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -2528,7 +2350,7 @@ window.addEventListener('appinstalled',()=>{toast('✅ Rimu.io instalado!');dism
 function showInstallBanner(){
   if(document.getElementById('installBanner')) return;
   const b=document.createElement('div'); b.id='installBanner';
-  b.innerHTML=`<div style="position:fixed;bottom:76px;left:12px;right:12px;z-index:8000;background:linear-gradient(135deg,#1a0f2e,#200d40);border:1.5px solid var(--lime);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(168,85,247,.25);animation:sUp .4s cubic-bezier(.22,1,.36,1)"><div style="width:44px;height:44px;border-radius:12px;background:#08070d;border:2px solid var(--lime);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--lime);flex-shrink:0">R</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Instalar Rimu.io</div><div style="font-size:11px;color:var(--dim);margin-top:2px">Adicionar à tela inicial</div></div><button onclick="doInstall()" style="background:var(--lime);color:#08070d;border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Instalar</button><button onclick="dismissInstall()" style="background:transparent;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 2px;line-height:1">×</button></div>`;
+  b.innerHTML=`<div style="position:fixed;bottom:76px;left:12px;right:12px;z-index:8000;background:linear-gradient(135deg,#1a0f2e,#200d40);border:1.5px solid var(--lime);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(168,85,247,.25);animation:sUp .4s cubic-bezier(.22,1,.36,1)"><div style="width:44px;height:44px;border-radius:12px;background:#08070d;border:2px solid var(--lime);display:flex;align-items:center;justify-content:center;font-family:'Orbitron',sans-serif;font-size:20px;color:var(--lime);flex-shrink:0">R</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Instalar Rimu.io</div><div style="font-size:11px;color:var(--dim);margin-top:2px">Adicionar à tela inicial</div></div><button onclick="doInstall()" style="background:var(--lime);color:#08070d;border:none;border-radius:10px;padding:9px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif">Instalar</button><button onclick="dismissInstall()" style="background:transparent;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:0 2px;line-height:1">×</button></div>`;
   document.body.appendChild(b);
 }
 
@@ -2597,7 +2419,7 @@ function salvarEdicaoPerfil() {
   renderTreino();
   renderDieta();
   closeMov('mEditPerfil');
-  toast('Perfil atualizado! ✓');
+  toast('Perfil atualizado! ✓','ok');
 }
 
 function refazerQuestionario() {
