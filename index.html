@@ -1110,6 +1110,49 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;heigh
 <div class="toast" id="toastEl"></div>
 
 <script>
+
+// ═══════════════════════════════════════════════════════════════
+//  POLYFILL GLOBAL — garante que Notification nunca quebre
+// ═══════════════════════════════════════════════════════════════
+if (typeof Notification === 'undefined') {
+  window.Notification = {
+    permission: 'denied',
+    requestPermission: async () => 'denied'
+  };
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  NOTIFICATION HELPER — compatível com todos os browsers
+// ═══════════════════════════════════════════════════════════════
+const Notif = {
+  get supported() {
+    // Safari iOS não suporta Notification API fora de PWA instalado
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode:standalone)').matches;
+    if (isIOS && !isStandalone) return false;
+    return typeof Notification !== 'undefined' && 'Notification' in window;
+  },
+  get permission() { return this.supported ? Notification.permission : 'denied'; },
+  async request() {
+    if (!this.supported) return 'denied';
+    try { return await Notification.requestPermission(); }
+    catch(e) { return 'denied'; }
+  },
+  send(title, body, opts={}) {
+    if (!this.supported || Notification.permission !== 'granted') return;
+    try {
+      new Notification(title, {
+        body,
+        icon: opts.icon || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💪</text></svg>',
+        badge: opts.badge || '',
+        tag: opts.tag || 'rimu-' + Date.now(),
+        vibrate: opts.vibrate || [200,100,200],
+        ...opts
+      });
+    } catch(e) { console.warn('Notif.send error:', e); }
+  }
+};
+
 // ═══════════════════════════════════════════════════════════════
 //  DATABASE
 // ═══════════════════════════════════════════════════════════════
@@ -1740,7 +1783,7 @@ function iniciarApp() {
   renderMetas();
 
   // Iniciar notificações
-  if (Notification && (typeof Notification !== 'undefined' ? Notification.permission : 'denied') === 'granted') iniciarNotificacoes();
+  if (Notif.permission === 'granted') iniciarNotificacoes();
 }
 
 
@@ -2373,8 +2416,14 @@ function initPWA(){
   const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
   const lnk=document.getElementById('pwaManifest'); if(lnk) lnk.href=URL.createObjectURL(blob);
   if('serviceWorker' in navigator){
-    const sw=`const C='rimu-v1';self.addEventListener('install',()=>self.skipWaiting());self.addEventListener('fetch',e=>e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{c.put(e.request,res.clone());return res;})))))`;
-    navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).catch(()=>{});
+    // Limpar SWs antigos primeiro para evitar cache de versões antigas
+    navigator.serviceWorker.getRegistrations().then(regs => {
+      regs.forEach(r => r.unregister());
+    });
+    const sw=`const C='rimu-v3';self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.add('/')));self.skipWaiting();});self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==C).map(k=>caches.delete(k)))));});self.addEventListener('fetch',e=>e.respondWith(caches.open(C).then(c=>c.match(e.request).then(r=>r||fetch(e.request).then(res=>{if(res.ok)c.put(e.request,res.clone());return res;}).catch(()=>r)))))`;
+    setTimeout(()=>{
+      navigator.serviceWorker.register(URL.createObjectURL(new Blob([sw],{type:'text/javascript'}))).catch(()=>{});
+    }, 2000);
   }
 }
 
@@ -2478,8 +2527,26 @@ function refazerQuestionario() {
 let _notifTimers = [];
 
 function openNotifSettings() {
-  const perm = (typeof Notification !== 'undefined' ? Notification.permission : 'denied');
-  document.getElementById('notifPermBlock').style.display = perm === 'granted' ? 'none' : 'block';
+  const perm = Notif.permission;
+  const permBlock = document.getElementById('notifPermBlock');
+
+  if (perm === 'granted') {
+    permBlock.style.display = 'none';
+  } else if (perm === 'denied') {
+    // Bloqueado pelo usuário — mostrar instruções para ativar
+    permBlock.style.display = 'block';
+    permBlock.innerHTML = `
+      <div style="font-size:22px;margin-bottom:6px">🔕</div>
+      <div style="font-size:13px;font-weight:700;margin-bottom:4px">Notificações bloqueadas</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:10px;line-height:1.6">
+        Ative nas <strong>configurações do Chrome</strong>:<br>
+        Menu ⋮ → Configurações → Notificações → Rimu.io → Permitir
+      </div>`;
+  } else {
+    // 'default' — nunca pediu permissão
+    permBlock.style.display = 'block';
+  }
+
   // Carregar configurações salvas
   const cfg = DB.get('notif:'+U.email) || {};
   document.getElementById('nt_agua').checked      = cfg.agua      ?? false;
@@ -2495,13 +2562,31 @@ function openNotifSettings() {
 }
 
 async function pedirPermissao() {
-  const perm = await (typeof Notification !== 'undefined' ? Notification.requestPermission() : Promise.resolve('denied'));
+  if (!Notif.supported) {
+    const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isStandalone = window.navigator.standalone === true || window.matchMedia('(display-mode:standalone)').matches;
+    if (isIOS && !isStandalone) {
+      toast('No iPhone, instale o app primeiro! 📲', 'err');
+      document.getElementById('notifPermBlock').innerHTML = `
+        <div style="font-size:20px;margin-bottom:6px">📲</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:4px">Instale o app primeiro</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.6">No iPhone, notificações só funcionam após instalar o Rimu.io.<br>Toque em <strong>Compartilhar ⬆️</strong> → <strong>"Adicionar à Tela de Início"</strong></div>`;
+      document.getElementById('notifPermBlock').style.display = 'block';
+    } else {
+      toast('Seu navegador não suporta notificações', 'err');
+    }
+    return;
+  }
+  const perm = await Notif.request();
   if (perm === 'granted') {
     document.getElementById('notifPermBlock').style.display = 'none';
-    toast('Notificações ativadas! 🔔');
+    toast('Notificações ativadas! 🔔', 'ok');
     iniciarNotificacoes();
+  } else if (perm === 'denied') {
+    toast('Bloqueado! Ative nas configurações do navegador 🔕', 'err');
+    document.getElementById('notifPermBlock').innerHTML += `<div style="font-size:11px;color:var(--dim);margin-top:8px;line-height:1.6">Para ativar: <strong>Configurações do Chrome → Notificações → Permitir</strong></div>`;
   } else {
-    toast('Permissão negada pelo navegador');
+    toast('Permissão negada pelo navegador', 'err');
   }
 }
 
@@ -2522,17 +2607,7 @@ function saveNotifSettings() {
 }
 
 function enviarNotif(titulo, corpo, icone) {
-  if (typeof Notification === 'undefined') return;
-  if (Notification.permission !== 'granted') return;
-  try {
-    const n = new Notification(titulo, {
-      body: corpo,
-      icon: icone || 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">💪</text></svg>',
-      badge: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">R</text></svg>',
-      tag: 'rimu-' + Date.now(),
-      vibrate: [200, 100, 200]
-    });
-  } catch(e) { console.warn('Notif error:', e); }
+  Notif.send(titulo, corpo, { icon: icone });
 }
 
 function iniciarNotificacoes() {
@@ -2540,7 +2615,7 @@ function iniciarNotificacoes() {
   _notifTimers.forEach(t => clearInterval(t));
   _notifTimers = [];
 
-  if ((typeof Notification !== 'undefined' ? Notification.permission : 'denied') !== 'granted') return;
+  if (Notif.permission !== 'granted') return;
   const cfg = DB.get('notif:'+U.email) || {};
 
   // 💧 ÁGUA — intervalo em horas
@@ -2607,7 +2682,7 @@ function iniciarNotificacoes() {
 }
 
 function testNotif() {
-  if ((typeof Notification !== 'undefined' ? Notification.permission : 'denied') !== 'granted') {
+  if (Notif.permission !== 'granted') {
     pedirPermissao(); return;
   }
   enviarNotif('🔔 Rimu.io', 'Notificações funcionando! Tudo certo por aqui ✓');
