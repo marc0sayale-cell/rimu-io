@@ -1224,7 +1224,8 @@ const PRO_ACCOUNTS = [
   'marc0s.ayale@gmail.com',
   'maxv59895@gmail.com',
   'samucasesso1339@gmail.com',
-  'enzogomesztral@gmail.com'
+  'enzogomesztral@gmail.com',
+  'tadeuhelio33@gmail.com'
 ];
 function isPro(email) {
   return PRO_ACCOUNTS.includes((email||'').toLowerCase());
@@ -1340,8 +1341,32 @@ function doLogin() {
           toast('Muitas tentativas, tente mais tarde');
         } else if (err.code==='auth/network-request-failed') {
           toast('Sem conexão com a internet');
+        } else if (err.code==='auth/internal-error' || err.code==='auth/operation-not-allowed') {
+          // Firebase com problema interno — fallback offline para contas PRO
+          if (isPro(email)) {
+            const saved = DB.get('u:'+email) || {};
+            if (saved.senha && saved.senha !== senha) { toast('Senha incorreta','err'); done(); return; }
+            U = Object.assign({ nome: saved.nome || email.split('@')[0], email, plan:'pro' }, saved);
+            U.plan = 'pro';
+            DB.set('u:'+email, U); DB.set('session', email);
+            done();
+            if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
+          } else {
+            toast('Erro interno. Tente novamente.');
+          }
         } else {
-          toast(err.code || err.message || 'Erro desconhecido');
+          // Fallback genérico: conta PRO entra offline
+          if (isPro(email)) {
+            const saved = DB.get('u:'+email) || {};
+            if (saved.senha && saved.senha !== senha) { toast('Senha incorreta','err'); done(); return; }
+            U = Object.assign({ nome: saved.nome || email.split('@')[0], email, plan:'pro' }, saved);
+            U.plan = 'pro';
+            DB.set('u:'+email, U); DB.set('session', email);
+            done();
+            if (U.onboarded) { iniciarApp(); } else { mostrar('pgPlan'); }
+          } else {
+            toast(err.code || err.message || 'Erro desconhecido');
+          }
         }
       })
       .finally(done);
@@ -1375,8 +1400,18 @@ function doRegister() {
         mostrar('pgPlan');
       })
       .catch(err => {
-        const msgs = {'auth/email-already-in-use':'E-mail já cadastrado! Faça login.','auth/invalid-email':'E-mail inválido','auth/weak-password':'Senha muito fraca'};
-        toast(msgs[err.code] || 'Erro ao criar conta');
+        if (err.code === 'auth/email-already-in-use') {
+          // Conta já existe no Firebase — tenta fazer login direto
+          toast('Conta já existe. Entrando...', 'ok');
+          document.getElementById('lEmail').value = email;
+          document.getElementById('lPass').value  = senha;
+          authTab('login');
+          done();
+          setTimeout(() => doLogin(), 400);
+        } else {
+          const msgs = {'auth/invalid-email':'E-mail inválido','auth/weak-password':'Senha muito fraca'};
+          toast(msgs[err.code] || 'Erro ao criar conta', 'err');
+        }
       })
       .finally(done);
   });
