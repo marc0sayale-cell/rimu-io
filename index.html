@@ -1784,6 +1784,57 @@ function iniciarApp() {
 
   // Iniciar notificações
   if (Notif.permission === 'granted') iniciarNotificacoes();
+
+  // ── Usuário PRO sem planos gerados? Gera em background silencioso ──
+  if (U.plan === 'pro' && U.onboarded) {
+    const temDieta  = !!DB.get('d:'+U.email);
+    const temTreino = !!DB.get('w:'+U.email);
+    if (!temDieta || !temTreino) {
+      gerarPlanosBackground(temDieta, temTreino);
+    }
+  }
+}
+
+async function gerarPlanosBackground(temDieta, temTreino) {
+  // Garante que U tem dados mínimos para gerar
+  if (!U.peso)     U.peso     = '75';
+  if (!U.metaPeso) U.metaPeso = '70';
+  if (!U.altura)   U.altura   = '170';
+  if (!U.idade)    U.idade    = 25;
+  if (!U.sexo)     U.sexo     = 'Não informado';
+  if (!U.objetivo) U.objetivo = 'Ganhar massa muscular';
+  if (!U.nivel)    U.nivel    = 'Intermediário';
+  if (!U.local)    U.local    = 'Academia';
+  if (!U.freq)     U.freq     = '3–4 dias/semana';
+  if (!U.dieta)    U.dieta    = 'Sem restrições';
+  if (!U.ngosta)   U.ngosta   = 'nada';
+
+  toast('⏳ Gerando seu plano personalizado...', 'ok');
+
+  try {
+    if (!temDieta) {
+      const dieta = await gerarDieta();
+      DB.set('d:'+U.email, dieta);
+      renderDieta();
+    }
+    if (!temTreino) {
+      const treino = await gerarTreino();
+      DB.set('w:'+U.email, treino);
+      renderTreino();
+    }
+    if (!DB.get('g:'+U.email)) {
+      DB.set('g:'+U.email, gerarMetasIniciais());
+      renderMetas();
+    }
+    renderHome();
+    toast('✅ Plano gerado com sucesso!', 'ok');
+  } catch(e) {
+    // Usa fallback estático
+    if (!temDieta)  { DB.set('d:'+U.email, fbDieta());  renderDieta(); }
+    if (!temTreino) { DB.set('w:'+U.email, fbTreino()); renderTreino(); }
+    renderHome();
+    toast('Plano padrão carregado ✓', 'ok');
+  }
 }
 
 
@@ -1911,6 +1962,16 @@ function renderDieta() {
   }
   const plan=DB.get('d:'+U.email);
   const meals=DB.get('m:'+U.email)||[];
+  // PRO mas sem plano — mostrar botão de gerar
+  if (!plan) {
+    el.innerHTML = `<div class="locked">
+      <div class="lockIco">🤖</div>
+      <div class="lockTtl">Gerando seu plano...</div>
+      <div class="lockSub">Aguarde enquanto a IA cria sua dieta personalizada, ou toque abaixo para gerar agora.</div>
+      <button class="upgBtn" onclick="gerarPlanosBackground(false,false)" style="background:linear-gradient(135deg,var(--blue),var(--cyan))">🚀 Gerar plano agora</button>
+    </div>`;
+    return;
+  }
   const tod=hoje();
   const todM=meals.filter(m=>m.date===tod);
   const totK=todM.reduce((s,m)=>s+(+m.kcal||0),0);
@@ -2022,6 +2083,15 @@ function renderTreino(){
   }
   const plan=DB.get('w:'+U.email);
   const wks=DB.get('k:'+U.email)||[];
+  if (!plan) {
+    el.innerHTML = `<div class="locked">
+      <div class="lockIco">🤖</div>
+      <div class="lockTtl">Sem plano de treino</div>
+      <div class="lockSub">A IA ainda não gerou seu treino. Toque abaixo para criar agora.</div>
+      <button class="upgBtn" onclick="gerarPlanosBackground(true,false)" style="background:linear-gradient(135deg,var(--blue),var(--cyan))">🚀 Gerar treino agora</button>
+    </div>`;
+    return;
+  }
   const tod=hoje();
   const dow=new Date().toLocaleDateString('pt-BR',{weekday:'long'});
   let html='';
