@@ -1777,8 +1777,12 @@ function iniciarApp() {
   renderFinancas();
   renderMetas();
 
-  // Iniciar notificações
-  if (Notif.permission === 'granted') iniciarNotificacoes();
+  // Notificações: inicia se já tem permissão, senão pede após 3s (primeira vez)
+  if (Notif.permission === 'granted') {
+    iniciarNotificacoes();
+  } else if (Notif.permission !== 'denied' && !DB.get('notif_asked')) {
+    setTimeout(() => pedirPermissaoAuto(), 3000);
+  }
 
   // ── Usuário PRO sem planos gerados? Gera em background silencioso ──
   if (U.plan === 'pro' && U.onboarded) {
@@ -2790,12 +2794,71 @@ function iniciarNotificacoes() {
   _notifTimers.push(horarioTimer);
 }
 
+// Pedido automático na primeira abertura — banner bonito
+function pedirPermissaoAuto() {
+  if (Notif.permission === 'granted' || Notif.permission === 'denied') return;
+  if (DB.get('notif_asked')) return;
+  DB.set('notif_asked', true);
+
+  // Criar banner no topo da home
+  const banner = document.createElement('div');
+  banner.id = 'notifBanner';
+  banner.innerHTML = `
+    <div style="position:fixed;top:0;left:0;right:0;z-index:8500;
+      background:linear-gradient(135deg,#0a1535,#060e24);
+      border-bottom:2px solid var(--blue);
+      padding:14px 16px 14px;
+      display:flex;align-items:center;gap:12px;
+      box-shadow:0 4px 24px rgba(67,97,238,.3);
+      animation:slideR .4s cubic-bezier(.22,1,.36,1)">
+      <div style="font-size:28px;flex-shrink:0">🔔</div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;margin-bottom:2px">Ativar notificações?</div>
+        <div style="font-size:11px;color:var(--dim)">Lembretes de água, treino e refeições</div>
+      </div>
+      <button onclick="aceitarNotifBanner()" style="
+        background:linear-gradient(135deg,var(--blue),var(--cyan));
+        color:#fff;border:none;border-radius:8px;
+        padding:8px 14px;font-size:12px;font-weight:700;
+        cursor:pointer;font-family:'DM Sans',sans-serif;
+        flex-shrink:0">Sim!</button>
+      <button onclick="fecharNotifBanner()" style="
+        background:transparent;border:none;color:var(--dim);
+        font-size:20px;cursor:pointer;padding:0 4px;line-height:1;
+        flex-shrink:0">×</button>
+    </div>`;
+  document.body.appendChild(banner);
+}
+
+function aceitarNotifBanner() {
+  fecharNotifBanner();
+  pedirPermissao();
+}
+
+function fecharNotifBanner() {
+  const b = document.getElementById('notifBanner');
+  if (b) b.remove();
+}
+
 function testNotif() {
   if (Notif.permission !== 'granted') {
     pedirPermissao(); return;
   }
-  enviarNotif('🔔 Rimu.io', 'Notificações funcionando! Tudo certo por aqui ✓');
-  toast('Notificação enviada!');
+  // Testa via SW (se disponível) e via API direta simultaneamente
+  const titulo = '🔔 Rimu.io';
+  const corpo  = 'Notificações funcionando! ✓';
+  const reg = window._swReg;
+  if (reg && reg.showNotification) {
+    reg.showNotification(titulo, {
+      body: corpo,
+      icon: './icon-192.svg',
+      tag: 'rimu-test',
+      vibrate: [200,100,200],
+    });
+  } else {
+    Notif.send(titulo, corpo);
+  }
+  toast('Notificação enviada! ✓', 'ok');
 }
 
 window.addEventListener('load',()=>{ initPWA(); checkiOS(); });
