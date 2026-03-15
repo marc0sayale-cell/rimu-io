@@ -742,9 +742,21 @@ const DB = {
   async sync(uid){
     if(!_db)return;
     try{
-      const s=await _db.collection('users').doc(uid).get();
-      if(s.exists){ const d=s.data(); Object.keys(d).forEach(k=>this.set(k,d[k])); }
-    }catch(e){console.warn(e);}
+      var s=await _db.collection('users').doc(uid).get();
+      if(s.exists){
+        var d=s.data();
+        // Só importa keys do Firebase que não existem localmente
+        // (preserva progresso local mais recente)
+        Object.keys(d).forEach(function(k){
+          var local=localStorage.getItem('evo_'+k);
+          if(!local) localStorage.setItem('evo_'+k, typeof d[k]==='string'?d[k]:JSON.stringify(d[k]));
+        });
+      }
+    }catch(e){console.warn('sync:',e);}
+  },
+  async save(uid, k, v){
+    if(!_db)return;
+    try{ await _db.collection('users').doc(uid).set({[k]:v},{merge:true}); }catch(e){}
   }
 };
 // Migrar keys antigas (rimu_ → evo_)
@@ -843,7 +855,14 @@ function boot(){
   var sess=DB.get('session');
   if(sess){
     var saved=DB.get('u:'+sess);
-    if(saved){ U=saved; U.plan=isPro(U.email)?'pro':'free'; U.onboarded?iniciarApp():mostrar('pgPlan'); return; }
+    if(saved){
+      U=saved;
+      // Sempre forçar plano PRO para emails na lista
+      U.plan=isPro(U.email)?'pro':(U.plan||'free');
+      DB.set('u:'+sess, U); // Salvar com plano correto
+      U.onboarded?iniciarApp():mostrar('pgPlan');
+      return;
+    }
   }
   mostrar('pgAuth');
 }
@@ -875,9 +894,12 @@ function doGoogle(){
     _auth.signInWithPopup(provider).then(function(r){
       _fbUser=r.user;
       DB.sync(r.user.uid).then(function(){
-        var email=r.user.email, saved=DB.get('u:'+email)||{};
+        var email=r.user.email;
+        var saved=DB.get('u:'+email)||{};
+        // Preservar dados locais, só preencher campos vazios
         U=Object.assign({nome:r.user.displayName||'Usuario',email:email,plan:'free'},saved);
         U.plan=isPro(U.email)?'pro':'free';
+        U.nome=U.nome||r.user.displayName||'Usuario';
         DB.set('u:'+email,U); DB.set('session',email);
         done(); U.onboarded?iniciarApp():mostrar('pgPlan');
       });
@@ -912,6 +934,7 @@ function doLogin(){
       _fbUser=cred.user;
       DB.sync(cred.user.uid).then(function(){
         var saved=DB.get('u:'+email)||{};
+        // Object.assign: dados locais salvos têm prioridade sobre defaults
         U=Object.assign({nome:cred.user.displayName||'Usuario',email:email,plan:'free'},saved);
         U.plan=isPro(U.email)?'pro':'free';
         DB.set('u:'+email,U); DB.set('session',email);
@@ -1178,9 +1201,12 @@ async function rodarGeracao(){
 // INICIAR APP
 // ═══════════════════════════════════
 function iniciarApp(){
+  // Garantir plano correto antes de tudo
+  U.plan=isPro(U.email)?'pro':(U.plan||'free');
+  DB.set('u:'+U.email,U);
   mostrar('pgApp');
   document.getElementById('tbName').textContent=(U.nome||'EVOLUAI').toUpperCase();
-  if(U.plan!=='pro') document.getElementById('icPro').style.display='flex';
+  document.getElementById('icPro').style.display=(U.plan!=='pro'?'flex':'none');
   navTo('home');
 }
 
