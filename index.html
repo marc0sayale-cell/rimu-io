@@ -1689,6 +1689,96 @@ function renderPerf(){
 // ═══════════════════════════════════
 // PWA
 // ═══════════════════════════════════
+var _deferredPrompt=null;
+
+// Captura o evento de instalação do Android/Chrome
+window.addEventListener('beforeinstallprompt',function(e){
+  e.preventDefault();
+  _deferredPrompt=e;
+  // Mostra banner após 3 segundos
+  setTimeout(showInstallBanner, 3000);
+});
+
+window.addEventListener('appinstalled',function(){
+  toast('Evoluai instalado com sucesso!','ok');
+  dismissInstall();
+  _deferredPrompt=null;
+});
+
+function showInstallBanner(){
+  if(document.getElementById('installBanner')) return;
+  // Não mostrar se já está instalado como PWA
+  if(window.matchMedia('(display-mode: standalone)').matches) return;
+  if(window.navigator.standalone) return;
+
+  var b=document.createElement('div');
+  b.id='installBanner';
+  b.style.cssText='position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:12px;right:12px;z-index:8000;'
+    +'background:linear-gradient(135deg,#2d0a4e,#1e0830);'
+    +'border:1px solid rgba(155,79,222,.5);border-radius:16px;'
+    +'padding:14px 16px;display:flex;align-items:center;gap:12px;'
+    +'box-shadow:0 8px 32px rgba(0,0,0,.5);animation:su .3s ease;';
+  b.innerHTML=
+    '<img src="'+LOGO.mini+'" style="width:42px;height:42px;border-radius:10px;flex-shrink:0" alt="">'
+    +'<div style="flex:1;min-width:0">'
+    +'<div style="font-size:13px;font-weight:700;color:white">Adicionar Evoluai</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,.55);margin-top:2px">Instale para acesso rapido</div>'
+    +'</div>'
+    +'<button onclick="doInstall()" style="padding:8px 14px;border-radius:10px;background:linear-gradient(135deg,#7B2FBE,#e040fb);color:white;font-size:12px;font-weight:700;border:none;cursor:pointer;white-space:nowrap;font-family:Rajdhani,sans-serif;letter-spacing:.5px">Instalar</button>'
+    +'<button onclick="dismissInstall()" style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.1);border:none;cursor:pointer;color:rgba(255,255,255,.6);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0">×</button>';
+  document.body.appendChild(b);
+}
+
+function doInstall(){
+  if(_deferredPrompt){
+    _deferredPrompt.prompt();
+    _deferredPrompt.userChoice.then(function(r){
+      if(r.outcome==='accepted') toast('Instalando...','ok');
+      _deferredPrompt=null;
+    });
+  }
+  dismissInstall();
+}
+
+function dismissInstall(){
+  var b=document.getElementById('installBanner');
+  if(b){ b.style.animation='none'; b.style.opacity='0'; b.style.transform='translateY(20px)'; b.style.transition='.3s'; setTimeout(function(){b.remove();},300); }
+}
+
+// Banner iOS (Safari não suporta beforeinstallprompt)
+function checkiOS(){
+  var isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  var isStandalone=window.matchMedia('(display-mode:standalone)').matches||window.navigator.standalone;
+  if(!isIOS||isStandalone) return;
+  if(sessionStorage.getItem('iosTip')) return;
+  sessionStorage.setItem('iosTip','1');
+  setTimeout(function(){
+    var b=document.createElement('div');
+    b.id='iosBanner';
+    b.style.cssText='position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:12px;right:12px;z-index:8000;'
+      +'background:linear-gradient(135deg,#2d0a4e,#1e0830);border:1px solid rgba(155,79,222,.5);border-radius:16px;'
+      +'padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,.5);animation:su .3s ease;';
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;margin-bottom:8px';
+    var img=document.createElement('img');
+    img.src=LOGO.mini; img.style.cssText='width:36px;height:36px;border-radius:8px';
+    var title=document.createElement('div');
+    title.style.cssText='font-size:13px;font-weight:700;color:white';
+    title.textContent='Instalar Evoluai no iPhone';
+    var closeBtn=document.createElement('button');
+    closeBtn.textContent='x';
+    closeBtn.style.cssText='margin-left:auto;background:rgba(255,255,255,.1);border:none;width:26px;height:26px;border-radius:50%;color:rgba(255,255,255,.6);font-size:15px;cursor:pointer';
+    closeBtn.onclick=function(){ b.remove(); };
+    row.appendChild(img); row.appendChild(title); row.appendChild(closeBtn);
+    var inst=document.createElement('div');
+    inst.style.cssText='font-size:12px;color:rgba(255,255,255,.6);line-height:1.7';
+    inst.innerHTML='Toque em <strong style="color:white">Compartilhar</strong> no Safari<br>e selecione <strong style="color:white">Adicionar a Tela de Inicio</strong>';
+    b.appendChild(row); b.appendChild(inst);
+    document.body.appendChild(b);
+    setTimeout(function(){if(document.getElementById('iosBanner'))b.remove();},12000);
+  },3000);
+}
+
 function initPWA(){
   var icon=LOGO.mini;
   var al=document.getElementById('appleIcon'); if(al)al.href=icon;
@@ -1697,6 +1787,7 @@ function initPWA(){
     icons:[{src:icon,sizes:'192x192',type:'image/png',purpose:'any maskable'}]};
   var blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'});
   var lnk=document.getElementById('pwaManifest'); if(lnk)lnk.href=URL.createObjectURL(blob);
+  checkiOS();
   if('serviceWorker' in navigator && (location.hostname.includes('github.io')||location.hostname==='localhost')){
     var swB64='Y29uc3QgQz0nZXZvLXY2JztzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2luc3RhbGwnLCgpPT5zZWxmLnNraXBXYWl0aW5nKCkpO3NlbGYuYWRkRXZlbnRMaXN0ZW5lcignYWN0aXZhdGUnLGU9PntlLndhaXRVbnRpbChjYWNoZXMua2V5cygpLnRoZW4oa3M9PlByb21pc2UuYWxsKGtzLmZpbHRlcihrPT5rIT09QykubWFwKGs9PmNhY2hlcy5kZWxldGUoaykpKSkudGhlbigoKT0+c2VsZi5jbGllbnRzLmNsYWltKCkpKTt9KTtzZWxmLmFkZEV2ZW50TGlzdGVuZXIoJ2ZldGNoJyxlPT57aWYoZS5yZXF1ZXN0LnVybC5pbmNsdWRlcygnYXBpLmFudGhyb3BpYycpfHxlLnJlcXVlc3QudXJsLmluY2x1ZGVzKCdmaXJlYmFzZScpfHxlLnJlcXVlc3QudXJsLmluY2x1ZGVzKCdnb29nbGVhcGlzJykpcmV0dXJuO2UucmVzcG9uZFdpdGgoY2FjaGVzLm9wZW4oQykudGhlbihjPT5jLm1hdGNoKGUucmVxdWVzdCkudGhlbihyPT5yfHxmZXRjaChlLnJlcXVlc3QpLnRoZW4ocmVzPT57aWYocmVzLm9rKWMucHV0KGUucmVxdWVzdCxyZXMuY2xvbmUoKSk7cmV0dXJuIHJlczt9KS5jYXRjaCgoKT0+cikpKSk7fSk7';
     var swURL='data:text/javascript;base64,'+swB64;
